@@ -1,0 +1,51 @@
+{
+  "name": "a11y-dialog-component",
+  "description": "Accessible Dialog Component in Vanilla JS",
+  "version": "1.0.0",
+  "keywords": [
+    "dialog",
+    "modal",
+    "a11y",
+    "accessibility",
+    "aria",
+    "es6",
+    "es2015",
+    "vanilla js"
+  ],
+  "author": "Jonathan Levaillant <jonathan.levaillant@outlook.com> (http://jonathanlevaillant.fr)",
+  "scripts": {
+    "start": "yarn",
+    "dev": "gulp",
+    "watch": "gulp && gulp watch",
+    "build": "gulp --env production"
+  },
+  "main": "dist/a11y-dialog-component.js",
+  "module": "dist/a11y-dialog-component.es6.js",
+  "jsdelivr": "dist/a11y-dialog-component.min.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jonathanlevaillant/a11y-dialog-component.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonathanlevaillant/a11y-dialog-component/issues",
+    "email": "jonathan.levaillant@outlook.com"
+  },
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
+    "browserify": "^15.1.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "gulp": "^3.9.1",
+    "gulp-eslint": "^4.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.6.3",
+    "gulp-uglify": "^3.0.0",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0"
+  }
+}
