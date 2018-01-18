@@ -5,7 +5,7 @@ const browserify = require('browserify');
 const babelify = require('babelify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 const eslint = require('gulp-eslint');
 const sourcemaps = require('gulp-sourcemaps');
 
@@ -65,7 +65,8 @@ gulp.task('js', ['eslint'], () => {
 // task 'es6'
 gulp.task('es6', () =>
   gulp.src(paths.entry + paths.scripts)
-    .pipe(rename(`${file}.es6.js`))
+    .pipe(rename(`${file}.es.js`))
+    .pipe(production ? uglify() : util.noop())
     .pipe(gulp.dest(paths.output))
 );
 
