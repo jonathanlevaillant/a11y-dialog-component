@@ -20,7 +20,7 @@
     "build": "gulp --env production"
   },
   "main": "dist/a11y-dialog-component.js",
-  "module": "dist/a11y-dialog-component.es6.js",
+  "module": "dist/a11y-dialog-component.es.js",
   "jsdelivr": "dist/a11y-dialog-component.min.js",
   "repository": {
     "type": "git",
