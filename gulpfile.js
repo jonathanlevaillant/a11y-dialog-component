@@ -12,15 +12,24 @@ const sourcemaps = require('gulp-sourcemaps');
 /* config
  ========================================================================== */
 
-const moduleFileName = 'a11y-dialog-component';
+const appName = 'a11y-dialog-component';
 const eslintFileName = '.eslintrc.json';
 const requireClassName = 'Dialogs';
+const demoAppName = 'main';
 
 // paths
 const paths = {
   entry: 'src/',
   output: 'dist/',
-  app: `${moduleFileName}.js`,
+  app: `${appName}.js`,
+  scripts: '**/*.js',
+};
+
+// demo paths
+const demoPaths = {
+  entry: 'demo/src/',
+  output: 'demo/dist/',
+  app: `${demoAppName}.js`,
   scripts: '**/*.js',
 };
 
@@ -39,6 +48,29 @@ gulp.task('eslint', () =>
     .pipe(eslint.format())
 );
 
+/* demo
+ ========================================================================== */
+
+// task 'demo'
+gulp.task('demo', ['eslint'], () => {
+  browserify({
+      entries: demoPaths.entry + demoPaths.app,
+      debug: true,
+    })
+    .transform(babelify)
+    .bundle()
+    .on('error', err => {
+      console.error(`${err.message}${err.codeFrame}`);
+    })
+    .pipe(source(`${demoAppName}.js`))
+    .pipe(buffer())
+    .pipe(sourcemaps.init({
+      loadMaps: true,
+    }))
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest(demoPaths.output))
+});
+
 /* build (js, es)
  ========================================================================== */
 
@@ -54,7 +86,7 @@ gulp.task('js', ['eslint'], () => {
     .on('error', err => {
       console.error(`${err.message}${err.codeFrame}`);
     })
-    .pipe(production ? source(`${moduleFileName}.min.js`) : source(`${moduleFileName}.js`))
+    .pipe(production ? source(`${appName}.min.js`) : source(`${appName}.js`))
     .pipe(buffer())
     .pipe(sourcemaps.init({
       loadMaps: true,
@@ -67,7 +99,7 @@ gulp.task('js', ['eslint'], () => {
 // task 'es'
 gulp.task('es', () =>
   gulp.src(paths.entry + paths.scripts)
-    .pipe(rename(`${moduleFileName}.es.js`))
+    .pipe(rename(`${appName}.es.js`))
     .pipe(production ? uglify() : util.noop())
     .pipe(gulp.dest(paths.output))
 );
@@ -80,6 +112,7 @@ gulp.task('build', ['js', 'es']);
 
 gulp.task('watch', () => {
   gulp.watch(paths.entry + paths.scripts, ['js', 'es']);
+  gulp.watch(demoPaths.entry + demoPaths.scripts, ['demo']);
 });
 
 /* default (build)
