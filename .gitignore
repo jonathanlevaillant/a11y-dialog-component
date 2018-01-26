@@ -44,6 +44,4 @@ twbsconfig.yml
 
 # Folders to ignore
 node_modules
-
-# Ignore source maps
-dist/*.map
+dist
