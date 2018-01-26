@@ -37,7 +37,7 @@ const Dialogs = (() => {
       [this.firstFocusableElement] = this.focusableElements;
       this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
 
-      [this.page] = document.getElementsByClassName(options.pageClassName);
+      this.page = document.getElementsByClassName(options.pageClassName)[0] || document.querySelector('html');
       this.inertLayers = document.getElementsByClassName(options.inertLayersClassName);
       this.disabledPageClassName = options.disabledPageClassName;
 
