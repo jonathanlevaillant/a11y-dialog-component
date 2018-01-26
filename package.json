@@ -17,11 +17,17 @@
     "start": "yarn",
     "dev": "gulp",
     "watch": "gulp && gulp watch",
-    "build": "gulp --env production"
+    "build": "rm -rf ./dist && gulp && gulp --env production",
+    "prepublish": "yarn run build"
   },
   "main": "dist/a11y-dialog-component.js",
   "module": "dist/a11y-dialog-component.es.js",
   "jsdelivr": "dist/a11y-dialog-component.min.js",
+  "files": [
+    "dist/a11y-dialog-component.js",
+    "dist/a11y-dialog-component.es.js",
+    "dist/a11y-dialog-component.min.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/jonathanlevaillant/a11y-dialog-component.git"
