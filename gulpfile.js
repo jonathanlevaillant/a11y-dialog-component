@@ -12,14 +12,15 @@ const sourcemaps = require('gulp-sourcemaps');
 /* config
  ========================================================================== */
 
-// file name
-const file = 'a11y-dialog-component';
+const moduleFileName = 'a11y-dialog-component';
+const eslintFileName = '.eslintrc.json';
+const requireClassName = 'Dialogs';
 
 // paths
 const paths = {
   entry: 'src/',
   output: 'dist/',
-  app: `${file}.js`,
+  app: `${moduleFileName}.js`,
   scripts: '**/*.js',
 };
 
@@ -33,26 +34,27 @@ const production = !!util.env.env;
 gulp.task('eslint', () =>
   gulp.src(paths.entry + paths.scripts)
     .pipe(eslint({
-      configFile: '.eslintrc.json',
+      configFile: eslintFileName,
     }))
     .pipe(eslint.format())
 );
 
-/* build (js, es6)
+/* build (js, es)
  ========================================================================== */
 
 // task 'js'
 gulp.task('js', ['eslint'], () => {
   browserify({
       entries: paths.entry + paths.app,
+      standalone: requireClassName,
       debug: true,
     })
-    .transform('babelify')
+    .transform(babelify)
     .bundle()
     .on('error', err => {
       console.error(`${err.message}${err.codeFrame}`);
     })
-    .pipe(production ? source(`${file}.min.js`) : source(`${file}.js`))
+    .pipe(production ? source(`${moduleFileName}.min.js`) : source(`${moduleFileName}.js`))
     .pipe(buffer())
     .pipe(sourcemaps.init({
       loadMaps: true,
@@ -62,22 +64,22 @@ gulp.task('js', ['eslint'], () => {
     .pipe(gulp.dest(paths.output))
 });
 
-// task 'es6'
-gulp.task('es6', () =>
+// task 'es'
+gulp.task('es', () =>
   gulp.src(paths.entry + paths.scripts)
-    .pipe(rename(`${file}.es.js`))
+    .pipe(rename(`${moduleFileName}.es.js`))
     .pipe(production ? uglify() : util.noop())
     .pipe(gulp.dest(paths.output))
 );
 
 // task 'build'
-gulp.task('build', ['js', 'es6']);
+gulp.task('build', ['js', 'es']);
 
-/* watch (js, es6)
+/* watch (js, es)
  ========================================================================== */
 
 gulp.task('watch', () => {
-  gulp.watch(paths.entry + paths.scripts, ['js', 'es6']);
+  gulp.watch(paths.entry + paths.scripts, ['js', 'es']);
 });
 
 /* default (build)
