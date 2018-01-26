@@ -107,11 +107,11 @@ gulp.task('es', () =>
 // task 'build'
 gulp.task('build', ['js', 'es']);
 
-/* watch (js, es)
+/* watch (js, es, demo)
  ========================================================================== */
 
 gulp.task('watch', () => {
-  gulp.watch(paths.entry + paths.scripts, ['js', 'es']);
+  gulp.watch(paths.entry + paths.scripts, ['js', 'es', 'demo']);
   gulp.watch(demoPaths.entry + demoPaths.scripts, ['demo']);
 });
 
