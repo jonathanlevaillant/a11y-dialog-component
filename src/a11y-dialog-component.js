@@ -20,9 +20,6 @@ const Dialogs = (() => {
     'select:not([disabled])',
     'textarea:not([disabled])',
     'button:not([disabled])',
-    'iframe',
-    'object',
-    'embed',
     '[contenteditable]',
     '[tabindex]:not([tabindex^="-"])',
   ];
@@ -49,12 +46,15 @@ const Dialogs = (() => {
       this.onClick = this.onClick.bind(this);
       this.onKeydown = this.onKeydown.bind(this);
 
-      if (this.isOpen) {
-        this.open();
-      }
+      if (this.isOpen) this.open();
     }
 
     focusTrap(event) {
+      if (this.focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
       if (event.shiftKey && event.target === this.firstFocusableElement) {
         event.preventDefault();
         this.lastFocusableElement.focus();
@@ -67,11 +67,9 @@ const Dialogs = (() => {
     }
 
     setFocus() {
-      if (this.focusableElements.length > 0) {
-        window.setTimeout(() => {
-          this.firstFocusableElement.focus();
-        }, 100);
-      }
+      window.setTimeout(() => {
+        this.focusableElements.length > 0 ? this.firstFocusableElement.focus() : this.dialog.focus();
+      }, 100);
     }
 
     open(event) {
@@ -110,9 +108,7 @@ const Dialogs = (() => {
       }
 
       // restoring focus
-      if (this.trigger) {
-        this.trigger.focus();
-      }
+      if (this.trigger) this.trigger.focus();
 
       // remove event listeners
       this.removeEventListeners();
@@ -150,9 +146,7 @@ const Dialogs = (() => {
       if (this.trigger) {
         this.trigger.addEventListener('click', this.open);
         this.trigger.addEventListener('keydown', (event) => {
-          if (event.which === KEY_CODES.enter) {
-            this.open(event);
-          }
+          if (event.which === KEY_CODES.enter) this.open(event);
         });
       }
     }
