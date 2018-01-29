@@ -176,7 +176,7 @@ const Dialogs = (() => {
     activeDialog.close();
   };
 
-  const render = (selectors = '[data-component="dialog"]', config = CLASS_NAMES) => {
+  const init = (selectors = '[data-component="dialog"]', config = CLASS_NAMES) => {
     const triggers = document.querySelectorAll(selectors);
     const options = Object.assign({}, CLASS_NAMES, config);
 
@@ -192,7 +192,7 @@ const Dialogs = (() => {
     });
   };
 
-  return { open, close, render };
+  return { open, close, init };
 })();
 
 export default Dialogs;
