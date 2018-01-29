@@ -1,7 +1,7 @@
 {
   "name": "a11y-dialog-component",
   "description": "Accessible Dialog Component in Vanilla JS",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "keywords": [
     "dialog",
     "modal",
