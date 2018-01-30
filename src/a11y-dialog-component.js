@@ -45,6 +45,8 @@ const Dialogs = (() => {
       this.close = this.close.bind(this);
       this.onClick = this.onClick.bind(this);
       this.onKeydown = this.onKeydown.bind(this);
+      this.onTransitionEnd = this.onTransitionEnd.bind(this);
+      this.onAnimationEnd = this.onAnimationEnd.bind(this);
 
       if (this.isOpen) this.open();
     }
@@ -67,9 +69,8 @@ const Dialogs = (() => {
     }
 
     setFocus() {
-      window.setTimeout(() => {
-        this.focusableElements.length > 0 ? this.firstFocusableElement.focus() : this.dialog.focus();
-      }, 100);
+      // setting focus on the first focusable element
+      this.focusableElements.length > 0 ? this.firstFocusableElement.focus() : this.dialog.focus();
     }
 
     open(event) {
@@ -85,9 +86,6 @@ const Dialogs = (() => {
           inertLayer.setAttribute('inert', '');
         });
       }
-
-      // setting focus on the first focusable element
-      this.setFocus();
 
       // add event listeners
       this.addEventListeners();
@@ -118,6 +116,8 @@ const Dialogs = (() => {
       this.dialog.addEventListener('click', this.onClick);
       this.dialog.addEventListener('touchstart', this.onClick);
       this.dialog.addEventListener('keydown', this.onKeydown);
+      this.dialog.addEventListener('transitionend', this.onTransitionEnd);
+      this.dialog.addEventListener('animationend', this.onAnimationEnd);
       this.dismissTriggers.forEach((dismissTrigger) => {
         dismissTrigger.addEventListener('click', this.close);
       });
@@ -127,6 +127,8 @@ const Dialogs = (() => {
       this.dialog.removeEventListener('click', this.onClick);
       this.dialog.removeEventListener('touchstart', this.onClick);
       this.dialog.removeEventListener('keydown', this.onKeydown);
+      this.dialog.removeEventListener('transitionend', this.onTransitionEnd);
+      this.dialog.removeEventListener('animationend', this.onAnimationEnd);
       this.dismissTriggers.forEach((dismissTrigger) => {
         dismissTrigger.removeEventListener('click', this.close);
       });
@@ -140,6 +142,14 @@ const Dialogs = (() => {
       if (event.which === KEY_CODES.escape) this.close(event);
       if (event.which === KEY_CODES.enter && event.target.hasAttribute('data-dismiss')) this.close(event);
       if (event.which === KEY_CODES.tab) this.focusTrap(event);
+    }
+
+    onTransitionEnd() {
+      this.setFocus();
+    }
+
+    onAnimationEnd() {
+      this.setFocus();
     }
 
     render() {
