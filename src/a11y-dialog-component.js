@@ -152,7 +152,8 @@ const Dialogs = (() => {
     }
   }
 
-  let activeDialog = null;
+  // save all active dialogs
+  const activeDialogs = [];
 
   const open = (dialog, config = CLASS_NAMES) => {
     const options = Object.assign({}, CLASS_NAMES, config);
@@ -162,12 +163,22 @@ const Dialogs = (() => {
     options.isNested = config.isNested || false;
     options.isOpen = true;
 
-    activeDialog = new Dialog(options);
-    activeDialog.render();
+    const currentDialog = new Dialog(options);
+    currentDialog.render();
+
+    // add targeted dialog to array
+    activeDialogs.push(currentDialog);
   };
 
-  const close = () => {
-    activeDialog.close();
+  const close = (dialog) => {
+    activeDialogs.forEach((activeDialog, index) => {
+      if (dialog === activeDialog.dialog.id) {
+        activeDialog.close();
+
+        // remove targeted dialog from array
+        activeDialogs.splice(index, 1);
+      }
+    });
   };
 
   const init = (selectors = '[data-component="dialog"]', config = CLASS_NAMES) => {
