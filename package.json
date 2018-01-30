@@ -1,7 +1,7 @@
 {
   "name": "a11y-dialog-component",
   "description": "Accessible Dialog Component in Vanilla JS",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "keywords": [
     "dialog",
     "modal",
@@ -17,7 +17,7 @@
     "start": "yarn",
     "dev": "gulp && gulp watch",
     "build": "rm -rf ./dist && gulp && gulp --env production",
-    "prepublish": "yarn run build"
+    "prepare": "yarn run build"
   },
   "main": "dist/a11y-dialog-component.js",
   "module": "dist/a11y-dialog-component.es.js",
