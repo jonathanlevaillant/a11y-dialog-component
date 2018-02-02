@@ -74,7 +74,7 @@ Deux autres attributs facultatifs sont disponibles :
 
 #### 3. La fenêtre modale
 
-Une fenêtre modale doit posséder un identifiant unique :exclamation:
+**Une fenêtre modale doit posséder un identifiant unique !**
 
 Afin d'être parfaitement accessible, il est conseillé d'utiliser la structure suivante :
 
@@ -106,8 +106,6 @@ const Dialogs = require('a11y-dialog-component').default; // commonjs module
 ```
 
 #### 6. Instanciation JavaScript
-
-L'instanciation de la librairie s'effectue de manière très simple :
 
 ```
 Dialogs.init();
