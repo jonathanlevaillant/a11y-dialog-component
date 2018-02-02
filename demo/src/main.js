@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // initial config
   Dialogs.init();
 
-  // programmatically open modal
+  // programmatically open dialog
   document.getElementById('js-trigger-dialog-2').addEventListener('click', () => {
     Dialogs.open('dialog-2', {
       triggerId: 'js-trigger-dialog-2',
