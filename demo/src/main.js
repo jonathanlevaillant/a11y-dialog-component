@@ -1,4 +1,4 @@
-import Dialogs from './../../dist/a11y-dialog-component.js';
+import Dialogs from './../../dist/a11y-dialog-component.es.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
