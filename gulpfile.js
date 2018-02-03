@@ -79,7 +79,6 @@ gulp.task('js', ['eslint'], () => {
   browserify({
       entries: paths.entry + paths.app,
       standalone: requireClassName,
-      debug: true,
     })
     .transform(babelify)
     .bundle()
@@ -88,11 +87,7 @@ gulp.task('js', ['eslint'], () => {
     })
     .pipe(production ? source(`${appName}.min.js`) : source(`${appName}.js`))
     .pipe(buffer())
-    .pipe(sourcemaps.init({
-      loadMaps: true,
-    }))
     .pipe(production ? uglify() : util.noop())
-    .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(paths.output))
 });
 
