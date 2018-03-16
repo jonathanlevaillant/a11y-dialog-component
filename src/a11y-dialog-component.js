@@ -5,7 +5,7 @@ const Dialogs = (() => {
   const DATA_COMPONENT = '[data-component="dialog"]';
 
   const CLASS_NAMES = {
-    pageClassName: 'js-page',
+    pageClassName: 'js-document',
     inertLayersClassName: 'js-inert-layer',
     disabledPageClassName: 'is-inactive',
   };
