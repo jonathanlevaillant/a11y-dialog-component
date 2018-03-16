@@ -41,8 +41,8 @@ p:first-child {
   margin-top: 0;
 }
 
-/* page */
-.c-page.is-inactive {
+/* document */
+.c-document.is-inactive {
   overflow: hidden;
 }
 
