@@ -41,7 +41,7 @@ const production = !!util.env.env;
 
 // task 'eslint'
 gulp.task('eslint', () =>
-  gulp.src(paths.entry + paths.scripts)
+  gulp.src(`${paths.entry}${paths.scripts}`)
     .pipe(eslint({
       configFile: eslintFileName,
     }))
@@ -54,7 +54,7 @@ gulp.task('eslint', () =>
 // task 'demo'
 gulp.task('demo', ['eslint'], () => {
   browserify({
-      entries: demoPaths.entry + demoPaths.app,
+      entries: `${demoPaths.entry}${demoPaths.app}`,
       debug: true,
     })
     .transform(babelify)
@@ -77,7 +77,7 @@ gulp.task('demo', ['eslint'], () => {
 // task 'js'
 gulp.task('js', ['eslint'], () => {
   browserify({
-      entries: paths.entry + paths.app,
+      entries: `${paths.entry}${paths.app}`,
       standalone: requireClassName,
     })
     .transform(babelify)
@@ -93,7 +93,7 @@ gulp.task('js', ['eslint'], () => {
 
 // task 'es'
 gulp.task('es', () =>
-  gulp.src(paths.entry + paths.scripts)
+  gulp.src(`${paths.entry}${paths.scripts}`)
     .pipe(rename(`${appName}.es.js`))
     .pipe(production ? uglify() : util.noop())
     .pipe(gulp.dest(paths.output))
@@ -106,8 +106,8 @@ gulp.task('build', ['js', 'es']);
  ========================================================================== */
 
 gulp.task('watch', () => {
-  gulp.watch(paths.entry + paths.scripts, ['js', 'es', 'demo']);
-  gulp.watch(demoPaths.entry + demoPaths.scripts, ['demo']);
+  gulp.watch(`${paths.entry}${paths.scripts}`, ['js', 'es', 'demo']);
+  gulp.watch(`${demoPaths.entry}${demoPaths.scripts}`, ['demo']);
 });
 
 /* default (build)
