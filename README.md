@@ -4,11 +4,11 @@
 
 ## Introduction
 
-**a11y-dialog-component** est une librairie écrite en pur JavaScript permettant de configurer facilement des
+**a11y-dialog-component** est une librairie écrite en JavaScript natif permettant de configurer facilement des
 fenêtres modales accessibles.
 
 Cette librairie respecte l'ensemble des critères d'accessibilité définis par 
-[WAI-ARIA](https://www.w3.org/TR/wai-aria-practices-1.1/#dialog_modal) tout en étant très légère (1.2 Ko minifiée / gzippée)
+[WAI-ARIA](https://www.w3.org/TR/wai-aria-practices-1.1/#dialog_modal) tout en étant très légère (1.3 Ko minifiée et gzippée)
 et simple à configurer.
 
 ## Fonctionnalités
@@ -28,25 +28,25 @@ et simple à configurer.
 
 ## Utilisation
 
-#### 1. Le document HTML
+#### 1. Structure HTML du document
 
-Afin de répondre aux critères d'accessibilité définis par WAI-ARIA, le document principal doit être désactivé à l'ouverture
-d'une fenêtre modale. Il est également recommandé de désactiver le scroll vertical de la page.
+Afin de répondre aux critères d'accessibilité définis par WAI-ARIA, le contenu principal du document HTML doit être 
+désactivé à l'ouverture d'une fenêtre modale. Il est également recommandé de désactiver le scroll vertical.
 
-Pour que la librairie JavaScript puisse cibler le document principal et la page, il est nécessaire de définir deux sélecteurs de classe :
+Pour que la librairie JavaScript puisse cibler ces éléments, il est conseillé d'ajouter dans le document HTML ces sélecteurs de classe :
 
-- Sélecteur CSS requis pour la désactivation du scroll vertical de la page : `js-page`
-- Sélecteur CSS requis pour la désactivation du document principal (lecteurs d'écran) : `js-inert-layer`
+- Sélecteur CSS requis pour la désactivation du scroll vertical (à ajouter généralement sur la balise `<html>` ou `<body>`) : `js-document`
+- Sélecteur CSS requis pour la désactivation du contenu principal du document (nécessaire aux lecteurs d'écran) : `js-inert-layer`
 
 ```
 <!doctype html>
-<html>
+<html class="js-document">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>A11Y Dialog Component</title>
   </head>
-  <body class="js-page">
+  <body>
     <main class="js-inert-layer">...</main>
     <div role="dialog">...</div>
   </body>
@@ -54,29 +54,31 @@ Pour que la librairie JavaScript puisse cibler le document principal et la page,
 
 ```
 
-Il est à noter que la fenêtre modale doit se situer en dehors du document principal.
+Il est à noter que la fenêtre modale doit se situer en dehors du contenu principal du document.
 
-#### 2. Le(s) bouton(s) d'appel
+#### 2. Structure HTML d'un bouton d'appel (trigger)
 
-Pour activer une fenêtre modale, il est nécessaire de définir un ou plusieurs boutons d'appel (trigger) avec les attributs suivants :
+**Attributs obligatoires :**
 
-- Instanciation du composant : `data-component="dialog"`
-- Identifiant de la fenêtre modale ciblée : `data-target="dialog-id"`
+- L'attribut de données `data-component="dialog"` permet d'instancier une nouvelle fenêtre modale.
+- L'attribut de données `data-target="dialog-ID"` permet de cibler une fenêtre modale avec l'identifiant `dialog-ID`
+- L'attribut ARIA `aria-haspopup="dialog"` indique aux lecteurs d'écran que l'activation du bouton d'appel déclenchera 
+l'ouverture d'une fenêtre modale.
 
 ```
 <button type="button" aria-haspopup="dialog" data-component="dialog" data-target="dialog-demo">Open dialog</button>
 ```
 
-Deux autres attributs facultatifs sont disponibles :
+**Attributs facultatifs :**
 
-- Ouverture de la fenêtre modale au chargement de la page : `data-open="true"`
-- Laisser le document actif à l'ouverture de la fenêtre modale : `data-disabled-page="false"`
+- `data-open="true"` : Déclenche l'ouverture de la fenêtre modale au chargement de la page.
+- `data-disabled-page="false"` : Laisse le document actif à l'ouverture de la fenêtre modale. 
 
-#### 3. La fenêtre modale
+#### 3. Structure HTML d'une fenêtre modale
 
-**Une fenêtre modale doit posséder un identifiant unique !**
+**Attention : Une fenêtre modale doit posséder un identifiant unique !**
 
-Afin d'être parfaitement accessible, il est conseillé d'utiliser la structure suivante :
+Afin de répondre aux critères d'accessibilité définis par WAI-ARIA, il est conseillé d'utiliser la structure suivante :
 
 ```
 <div id="dialog-demo" class="c-dialog" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="dialog-title" aria-describedby="dialog-description" tabindex="-1">
@@ -87,7 +89,9 @@ Afin d'être parfaitement accessible, il est conseillé d'utiliser la structure 
 </div>    
 ```
 
-#### 4. Le(s) bouton(s) de fermeture
+Pour davantage de précisions sur ces attributs, vous pouvez vous rendre sur le [blog de JoliCode](https://jolicode.com/blog/une-fenetre-modale-accessible)
+
+#### 4. Structure HTML d'un bouton de fermeture
 
 Un bouton de fermeture doit posséder l'attribut `data-dismiss`
 
@@ -97,7 +101,7 @@ Un bouton de fermeture doit posséder l'attribut `data-dismiss`
 
 #### 5. Ajout de la librairie JavaScript
 
-Vous pouvez directement importer **a11y-dialog-component** dans votre projet JavaScript 
+Vous pouvez importer directement **a11y-dialog-component** dans votre projet JavaScript 
 en utilisant une syntaxe ES6 (ES2015) ou CommonJS :
 
 ```
@@ -111,21 +115,22 @@ const Dialogs = require('a11y-dialog-component').default; // commonjs module
 Dialogs.init();
 ```
 
-#### 7. Personnalisation des classes CSS
+#### 7. Personnalisation des sélecteurs CSS
 
-Il est possible de personnaliser les classes CSS utilisées lors de l'instanciation de la librairie :
+Il est possible de personnaliser les sélecteurs CSS utilisés lors de l'instanciation des fenêtres modales :
 
 ```
 Dialogs.init({
-  pageClassName: 'js-custom-page',
+  pageClassName: 'js-custom-document',
   inertLayersClassName: 'js-custom-inert-layer',
   disabledPageClassName: 'is-inactive',
 });
 ```
 
-#### 8. Évènements JavaScript
+#### 8. Événements JavaScript
 
-En cas de besoin, vous pouvez déclencher l'ouverture ou la fermeture d'une ou plusieurs fenêtres modales directement en JavaScript :
+En cas de besoin, vous pouvez déclencher l'ouverture ou la fermeture d'une ou plusieurs fenêtres modales directement en JavaScript
+grâce aux méthodes `open('dialog-ID')` et `close('dialog-ID')` :
 
 ```
 Dialogs.open('dialog-demo');
@@ -133,9 +138,24 @@ Dialogs.open('dialog-nested');
 Dialogs.close('dialog-demo');
 ```
 
+**Paramètres facultatifs :**
+
+- `triggerId: 'trigger-ID'` : Associe la fenêtre modale à un bouton d'appel. 
+- `disabledPage: false` : Laisse le document actif à l'ouverture de la fenêtre modale.
+
+```
+Dialogs.open('dialog-demo', {
+  triggerId: 'js-trigger-demo',
+  disabledPage: false,
+});
+```
+
 #### 9. Styles CSS
 
-Styles CSS basiques pour l'ouverture et la fermeture d'une fenêtre modale :
+**a11y-dialog-component** a fait le choix de ne pas embarquer de styles CSS par défaut.  
+Vous êtes donc libres d'utiliser les styles que vous souhaitez !
+
+Néanmoins, nous recommandons au minimum ces styles nécessaires à l'ouverture et à la fermeture d'une fenêtre modale :
 
 ```
 .c-dialog {
@@ -151,8 +171,7 @@ Styles CSS basiques pour l'ouverture et la fermeture d'une fenêtre modale :
   background-color: rgba(0, 0, 0, .75);
 }
 
-.c-dialog__box {  
-  width: 100%;
+.c-dialog__box {
   max-width: 48rem;
   margin: auto;
   background-color: #fff;
@@ -163,17 +182,25 @@ Styles CSS basiques pour l'ouverture et la fermeture d'une fenêtre modale :
 }
 ```
 
+Si vous désirez utiliser des styles CSS par défaut, vous pouvez consulter le fichier `main.css` de la démo disponible 
+[ici](https://github.com/jonathanlevaillant/a11y-dialog-component/blob/master/demo/src/main.css)
+
 ## Contribution
 
 Si vous désirez contribuer à ce projet, rien de plus simple, suivez ces quelques étapes ! :kissing_closed_eyes:
+**a11y-dialog-component** suit les standards de développement JavaScript ES2015.
 
 #### Environnement de développement
 
-1. Cloner le dépôt GitHub : `$git clone https://github.com/jonathanlevaillant/a11y-dialog-component.git`
-2. Installer le gestionnaire de packages [yarn](https://yarnpkg.com/en/docs/install#mac-tab)
-3. Installer les dépendances à la racine du projet : `yarn start`
-4. Lancer le projet : `yarn dev`
-5. Créer une pull-request :ok_hand:
+1. Clonez le dépôt GitHub : `$git clone https://github.com/jonathanlevaillant/a11y-dialog-component.git`
+2. Installez le gestionnaire de packages [yarn](https://yarnpkg.com/en/docs/install#mac-tab)
+3. Installez les dépendances de développement : `yarn start`
+4. Lancez le projet (watch) : `yarn dev`
+5. Créez une pull-request :ok_hand:
+
+## D'autres librairies accessibles ?
+
+- [a11y-accordion-component](https://github.com/jonathanlevaillant/a11y-accordion-component) - Accordéons accessibles.
 
 ## Créateur
 
