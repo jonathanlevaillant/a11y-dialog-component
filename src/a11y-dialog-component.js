@@ -174,14 +174,18 @@ const Dialogs = (() => {
 
     onTransitionEnd(event) {
       // setting focus on the first focusable element after the css transition
-      if (event.target === this.dialog) this.setFocus();
-      this.dialog.removeEventListener('transitionend', this.onTransitionEnd);
+      if (event.target === this.dialog) {
+        this.setFocus();
+        this.dialog.removeEventListener('transitionend', this.onTransitionEnd);
+      }
     }
 
     onAnimationEnd(event) {
       // setting focus on the first focusable element after the css animation
-      if (event.target === this.dialog) this.setFocus();
-      this.dialog.removeEventListener('animationend', this.onAnimationEnd);
+      if (event.target === this.dialog) {
+        this.setFocus();
+        this.dialog.removeEventListener('animationend', this.onAnimationEnd);
+      }
     }
 
     render() {
