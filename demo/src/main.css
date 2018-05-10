@@ -5,7 +5,6 @@
 *,
 ::before,
 ::after {
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -58,22 +57,14 @@ p:first-child {
 
 /* grid */
 .o-grid {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-flow: row wrap;
   flex-flow: row wrap;
   margin-bottom: -2.4rem;
   margin-left: -2.4rem;
 }
 
 .o-grid__col {
-  -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  -webkit-box-flex: 0;
-  -ms-flex: 0 0 auto;
   flex: 0 0 auto;
   min-width: 0;
   min-height: 0;
@@ -124,7 +115,6 @@ p:first-child {
   position: relative;
   z-index: 0;
   display: inline-block;
-  -webkit-transform: translate3d(0, -0.25em, 0);
   transform: translate3d(0, -0.25em, 0);
   padding: 0.75em 1.5em;
   font-size: 1.6rem;
@@ -137,7 +127,6 @@ p:first-child {
   font-weight: 700;
   color: #e91e63;
   cursor: pointer;
-  -webkit-transition: .2s;
   transition: .2s;
 }
 
@@ -151,14 +140,11 @@ p:first-child {
   bottom: 0;
   left: 0;
   border-radius: inherit;
-  -webkit-box-shadow: 0 0.25em 0 0 #ccc;
   box-shadow: 0 0.25em 0 0 #ccc;
-  -webkit-transition: .2s;
   transition: .2s;
 }
 
 .c-btn::after {
-  -webkit-box-shadow: 0 0.25em 0 0 #aa1145;
   box-shadow: 0 0.25em 0 0 #aa1145;
   background-color: #e91e63;
   visibility: hidden;
@@ -180,7 +166,6 @@ p:first-child {
 
 .c-btn--unstyled {
   position: static;
-  -webkit-transform: none;
   transform: none;
   padding: 0;
   border-radius: 0;
@@ -211,7 +196,7 @@ p:first-child {
   transition: .2s;
 }
 
-.c-dialog__box {
+.c-dialog__inner {
   align-self: flex-start; /* ie fix */
   width: 100%;
   max-width: 48rem;
@@ -233,8 +218,20 @@ p:first-child {
   opacity: 0;
 }
 
-.c-dialog[aria-hidden="true"] .c-dialog__box {
+.c-dialog[aria-hidden="true"] .c-dialog__inner {
   transform: translate3d(0, -4.8rem, 0);
+}
+
+/* modeless and tooltip dialogs */
+.c-dialog--modeless {
+  position: static;
+  display: inline-block;
+  padding: 0;
+  background-color: transparent;
+}
+
+.c-dialog--modeless .c-dialog__inner {
+  background-color: #f0f0f0;
 }
 
 /* utilities */
@@ -247,14 +244,10 @@ p:first-child {
 }
 
 .u-flex {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
 }
 
 .u-flex-main-between {
-  -webkit-box-pack: justify;
-  -ms-flex-pack: justify;
   justify-content: space-between;
 }
 
