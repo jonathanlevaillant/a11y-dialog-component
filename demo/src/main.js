@@ -4,30 +4,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initial config
   Dialogs.init({
-    disabledDocumentClass: 'is-inactive',
-    activeTriggerClass: 'is-expanded',
+    triggerActiveClass: 'is-expanded',
   });
 
-  // programmatically render dialogs
-  Dialogs.render('dialog-1', {
-    triggerId: 'dialog-trigger-1',
-    isOpen: true,
-    labelledbyId: false,
+  Dialogs.create('dialog-3', {
+    triggerId: 'dialog-trigger-3',
+    labelledbyId: 'dialog-title-3',
+    describedbyId: 'dialog-desc-3',
+    backdrop: true,
   });
 
-  Dialogs.close('dialog-1');
-
-  Dialogs.render('dialog-tooltip-1', {
-    triggerId: 'dialog-tooltip-trigger-1',
-    hasBackdrop: false,
-    modal: false,
+  Dialogs.create('dialog-4', {
+    triggerId: 'dialog-trigger-4',
+    labelledbyId: 'dialog-title-4',
+    describedbyId: 'dialog-desc-4',
     tooltip: true,
+    modal: false,
+    backdrop: false,
     disableScroll: false,
   });
 
-  Dialogs.render('dialog-3');
+  Dialogs.create('dialog-5', {
+    labelledbyId: 'dialog-title-5',
+    describedbyId: 'dialog-desc-5',
+    backdrop: true,
+  });
 
-  window.setTimeout(() => Dialogs.open('dialog-3'), 2000);
+  Dialogs.create('dialog-nested-2', {
+    triggerId: 'dialog-trigger-nested-2',
+    labelledbyId: 'dialog-nested-title-2',
+    describedbyId: 'dialog-nested-desc-2',
+    backdrop: true,
+    disableScroll: false,
+  });
 
-  console.log(Dialogs.getDialogs());
+  window.setTimeout(() => Dialogs.show('dialog-5'), 2000);
+  window.setTimeout(() => Dialogs.hide('dialog-5'), 4000);
 });
