@@ -9,10 +9,27 @@
   <body>
     <article class="o-container">
       <h2>Dialogs</h2>
-      <button type="button" id="dialog-trigger-1" class="c-btn u-p" data-component="dialog" data-target="dialog-1">
+      <button
+        type="button"
+        id="dialog-trigger-1"
+        class="c-btn u-p"
+        data-component="dialog"
+        data-target="dialog-1"
+        data-labelledby="dialog-title-1"
+        data-describedby="dialog-desc-1">
         Open dialog 1
       </button>
-      <button type="button" id="dialog-trigger-2" class="c-btn u-p" data-component="dialog" data-target="dialog-2">
+      <button
+        type="button"
+        id="dialog-trigger-2"
+        class="c-btn u-p"
+        data-component="dialog"
+        data-target="dialog-2"
+        data-modal="false"
+        data-tooltip="true"
+        data-labelledby="dialog-title-2"
+        data-describedby="dialog-desc-2"
+        data-disable-scroll="false">
         Open tooltip dialog 2
       </button>
       <button type="button" id="dialog-trigger-3" class="c-btn u-p">
@@ -22,12 +39,7 @@
         Create tooltip dialog 4 (JS)
       </button>
     </article>
-    <div
-      id="dialog-1"
-      class="c-dialog"
-      data-labelledby="dialog-title-1"
-      data-describedby="dialog-desc-1"
-      data-backdrop="true">
+    <div id="dialog-1" class="c-dialog">
       <div class="c-dialog__inner">
         <header class="u-flex u-flex-main-between">
           <h2 id="dialog-title-1">Dialog 1</h2>
@@ -52,13 +64,16 @@
               <button type="button" class="c-btn u-w100">Save</button>
             </div>
           </div>
-          <button type="button" id="dialog-trigger-nested-1" class="c-btn u-p u-w100" data-component="dialog" data-target="dialog-nested-1">Open nested dialog 1</button>
-          <button type="button" id="dialog-trigger-nested-2" class="c-btn u-p u-w100">Open nested dialog 2 (JS)</button>
-          <div
-            id="dialog-nested-1"
-            class="c-dialog"
-            data-backdrop="true"
+          <button
+            type="button"
+            id="dialog-trigger-nested-1"
+            class="c-btn u-p u-w100"
+            data-component="dialog"
+            data-target="dialog-nested-1"
             data-disable-scroll="false">
+            Open nested dialog 1</button>
+          <button type="button" id="dialog-trigger-nested-2" class="c-btn u-p u-w100">Open nested dialog 2 (JS)</button>
+          <div id="dialog-nested-1" class="c-dialog">
             <div class="c-dialog__inner">
               <header class="u-flex u-flex-main-between">
                 <h2 id="dialog-nested-title-1">Nested dialog 1</h2>
@@ -73,9 +88,7 @@
               <button type="button" class="c-btn u-p u-w100" data-dismiss>Close</button>
             </div>
           </div>
-          <div
-            id="dialog-nested-2"
-            class="c-dialog">
+          <div id="dialog-nested-2" class="c-dialog">
             <div class="c-dialog__inner">
               <header class="u-flex u-flex-main-between">
                 <h2 id="dialog-nested-title-2">Nested dialog 2 (JS)</h2>
@@ -93,14 +106,7 @@
         </form>
       </div>
     </div>
-    <div
-      id="dialog-2"
-      class="c-dialog c-dialog--modeless"
-      data-modal="false"
-      data-tooltip="true"
-      data-labelledby="dialog-title-2"
-      data-describedby="dialog-desc-2"
-      data-disable-scroll="false">
+    <div id="dialog-2" class="c-dialog c-dialog--modeless">
       <div class="c-dialog__inner">
         <header class="u-flex u-flex-main-between">
           <h2 id="dialog-title-2">Tooltip dialog 2</h2>
@@ -114,9 +120,7 @@
         <p id="dialog-desc-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non.</p>
       </div>
     </div>
-    <div
-      id="dialog-3"
-      class="c-dialog">
+    <div id="dialog-3" class="c-dialog">
       <div class="c-dialog__inner">
         <header class="u-flex u-flex-main-between">
           <h2 id="dialog-title-3">Dialog 3 (JS)</h2>
@@ -131,9 +135,7 @@
         <button type="button" class="c-btn u-p u-w100" data-dismiss>Close</button>
       </div>
     </div>
-    <div
-      id="dialog-4"
-      class="c-dialog c-dialog--modeless">
+    <div id="dialog-4" class="c-dialog c-dialog--modeless">
       <div class="c-dialog__inner">
         <header class="u-flex u-flex-main-between">
           <h2 id="dialog-title-4">Tooltip dialog 4 (JS)</h2>
@@ -147,9 +149,7 @@
         <p id="dialog-desc-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non.</p>
       </div>
     </div>
-    <div
-      id="dialog-5"
-      class="c-dialog">
+    <div id="dialog-5" class="c-dialog">
       <div class="c-dialog__inner">
         <header class="u-flex u-flex-main-between">
           <h2 id="dialog-title-5">Dialog 5</h2>

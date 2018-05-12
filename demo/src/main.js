@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
     triggerId: 'dialog-trigger-3',
     labelledbyId: 'dialog-title-3',
     describedbyId: 'dialog-desc-3',
-    backdrop: true,
   });
 
   Dialogs.create('dialog-4', {
@@ -20,21 +19,18 @@ document.addEventListener('DOMContentLoaded', () => {
     describedbyId: 'dialog-desc-4',
     tooltip: true,
     modal: false,
-    backdrop: false,
     disableScroll: false,
   });
 
   Dialogs.create('dialog-5', {
     labelledbyId: 'dialog-title-5',
     describedbyId: 'dialog-desc-5',
-    backdrop: true,
   });
 
   Dialogs.create('dialog-nested-2', {
     triggerId: 'dialog-trigger-nested-2',
     labelledbyId: 'dialog-nested-title-2',
     describedbyId: 'dialog-nested-desc-2',
-    backdrop: true,
     disableScroll: false,
   });
 
