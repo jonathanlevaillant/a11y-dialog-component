@@ -3,7 +3,7 @@
 
 const Dialogs = (() => {
   const DATA_COMPONENT = '[data-component="dialog"]';
-  const DATA_DISMISS = '[data-dismiss]';
+  const DATA_DISMISS = '[data-dialog-hide]';
   const NESTED_ATTRIBUTE_PARSER = '[role="dialog"]';
 
   const CLASS_NAMES = {
