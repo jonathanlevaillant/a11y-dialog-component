@@ -99,7 +99,7 @@ const Dialogs = (() => {
       [this.firstFocusableElement] = this.focusableElements;
       this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
 
-      this.open = options.open;
+      this.isShown = options.show;
       this.modal = options.modal;
       this.tooltip = options.tooltip;
       this.backdrop = options.backdrop;
@@ -216,13 +216,13 @@ const Dialogs = (() => {
 
     // update aria attributes and classes
     setAttributes() {
-      this.dialog.setAttribute('aria-hidden', !this.open);
+      this.dialog.setAttribute('aria-hidden', !this.isShown);
 
-      if (this.trigger && this.open) this.trigger.classList.add(this.triggerActiveClass);
-      if (this.trigger && !this.open) this.trigger.classList.remove(this.triggerActiveClass);
+      if (this.trigger && this.isShown) this.trigger.classList.add(this.triggerActiveClass);
+      if (this.trigger && !this.isShown) this.trigger.classList.remove(this.triggerActiveClass);
 
-      if (this.disableScroll && this.open) this.document.classList.add(this.documentDisabledClass);
-      if (this.disableScroll && !this.open) this.document.classList.remove(this.documentDisabledClass);
+      if (this.disableScroll && this.isShown) this.document.classList.add(this.documentDisabledClass);
+      if (this.disableScroll && !this.isShown) this.document.classList.remove(this.documentDisabledClass);
     }
 
     // delete all data attributes if the dialog is destroyed
@@ -230,15 +230,14 @@ const Dialogs = (() => {
       if (this.trigger) {
         delete this.trigger.dataset.component;
         delete this.trigger.dataset.target;
+        delete this.trigger.dataset.labelledby;
+        delete this.trigger.dataset.describedby;
+        delete this.trigger.dataset.show;
+        delete this.trigger.dataset.modal;
+        delete this.trigger.dataset.tooltip;
+        delete this.trigger.dataset.backdrop;
+        delete this.trigger.dataset.disableScroll;
       }
-
-      delete this.dialog.dataset.labelledby;
-      delete this.dialog.dataset.describedby;
-      delete this.dialog.dataset.open;
-      delete this.dialog.dataset.modal;
-      delete this.dialog.dataset.tooltip;
-      delete this.dialog.dataset.backdrop;
-      delete this.dialog.dataset.disableScroll;
     }
 
     setFocus() {
@@ -272,7 +271,7 @@ const Dialogs = (() => {
     show(event) {
       if (event) event.preventDefault();
 
-      this.open = true;
+      this.isShown = true;
 
       this.setAttributes();
       this.addEventListeners();
@@ -283,7 +282,7 @@ const Dialogs = (() => {
     hide(event) {
       if (event) event.preventDefault();
 
-      this.open = false;
+      this.isShown = false;
 
       this.setAttributes();
       this.removeEventListeners();
@@ -293,9 +292,9 @@ const Dialogs = (() => {
 
     // required for the tooltip and non-modal dialogs
     toggle(event) {
-      this.open = !this.open;
+      this.isShown = !this.isShown;
 
-      this.open ? this.show(event) : this.hide(event);
+      this.isShown ? this.show(event) : this.hide(event);
     }
 
     destroy() {
@@ -314,7 +313,7 @@ const Dialogs = (() => {
       this.addAttributes();
       this.addObserver();
 
-      this.open ? this.show() : this.setAttributes();
+      this.isShown ? this.show() : this.setAttributes();
 
       if (this.trigger) {
         this.trigger.addEventListener('click', this.toggle);
@@ -338,14 +337,14 @@ const Dialogs = (() => {
 
         options.trigger = trigger;
         options.dialog = currentDialog;
-        options.labelledby = currentDialog.dataset.labelledby;
-        options.describedby = currentDialog.dataset.describedby;
+        options.labelledby = trigger.dataset.labelledby;
+        options.describedby = trigger.dataset.describedby;
 
-        options.open = currentDialog.dataset.open === 'true';
-        options.modal = currentDialog.dataset.modal !== 'false';
-        options.tooltip = currentDialog.dataset.tooltip === 'true';
-        options.backdrop = currentDialog.dataset.backdrop === 'true';
-        options.disableScroll = currentDialog.dataset.disableScroll !== 'false';
+        options.show = trigger.dataset.show === 'true';
+        options.modal = trigger.dataset.modal !== 'false';
+        options.tooltip = trigger.dataset.tooltip === 'true';
+        options.backdrop = trigger.dataset.backdrop !== 'false';
+        options.disableScroll = trigger.dataset.disableScroll !== 'false';
 
         const dialog = new Dialog(options);
         dialog.create();
@@ -360,10 +359,10 @@ const Dialogs = (() => {
     triggerId = null,
     labelledbyId = null,
     describedbyId = null,
-    open = false,
+    show = false,
     modal = true,
     tooltip = false,
-    backdrop = false,
+    backdrop = true,
     disableScroll = true,
   } = {}) => {
     const options = { ...customClassNames };
@@ -386,7 +385,7 @@ const Dialogs = (() => {
       options.labelledby = labelledbyId;
       options.describedby = describedbyId;
 
-      options.open = open;
+      options.show = show;
       options.modal = modal;
       options.tooltip = tooltip;
       options.backdrop = backdrop;
