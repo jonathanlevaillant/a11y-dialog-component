@@ -21,7 +21,8 @@ const Dialogs = (() => {
 
   const FOCUSABLE_ELEMENTS = [
     '[href]:not([tabindex^="-"])',
-    'input:not([disabled]):not([type="hidden"]):not([tabindex^="-"])',
+    'input:not([disabled]):not([type="hidden"]):not([tabindex^="-"]):not([type="radio"])',
+    'input[type="radio"]:checked',
     'select:not([disabled]):not([tabindex^="-"])',
     'textarea:not([disabled]):not([tabindex^="-"])',
     'button:not([disabled]):not([tabindex^="-"])',
@@ -120,7 +121,7 @@ const Dialogs = (() => {
       const dialogArea = `#${this.dialog.id}, ${DATA_COMPONENT}[data-target="${this.dialog.id}"]`;
 
       if (this.backdrop && event.target === this.dialog) this.hide();
-      if (this.tooltip && !event.target.closest(dialogArea)) this.hide();
+      if (this.tooltip && !event.target.closest(dialogArea)) this.hide(event, false);
     }
 
     onKeydown(event) {
@@ -130,7 +131,7 @@ const Dialogs = (() => {
           this.hide();
           break;
         case KEY_CODES.f6:
-          if (!this.modal) this.switchFocus();
+          if (!this.modal) !this.tooltip ? this.switchFocus() : this.hide();
           break;
         case KEY_CODES.tab:
           this.maintainFocus(event);
@@ -279,7 +280,7 @@ const Dialogs = (() => {
       window.setTimeout(() => this.setFocus(), 100);
     }
 
-    hide(event) {
+    hide(event, restoreFocus = true) {
       if (event) event.preventDefault();
 
       this.isShown = false;
@@ -287,7 +288,7 @@ const Dialogs = (() => {
       this.setAttributes();
       this.removeEventListeners();
 
-      window.setTimeout(() => this.restoreFocus(), 100);
+      if (restoreFocus) window.setTimeout(() => this.restoreFocus(), 100);
     }
 
     // required for the tooltip and non-modal dialogs
@@ -343,7 +344,7 @@ const Dialogs = (() => {
         options.show = trigger.dataset.show === 'true';
         options.modal = trigger.dataset.modal !== 'false';
         options.tooltip = trigger.dataset.tooltip === 'true';
-        options.backdrop = trigger.dataset.backdrop !== 'false';
+        options.backdrop = options.tooltip ? false : trigger.dataset.backdrop !== 'false';
         options.disableScroll = trigger.dataset.disableScroll !== 'false';
 
         const dialog = new Dialog(options);
@@ -388,7 +389,7 @@ const Dialogs = (() => {
       options.show = show;
       options.modal = modal;
       options.tooltip = tooltip;
-      options.backdrop = backdrop;
+      options.backdrop = tooltip ? false : backdrop;
       options.disableScroll = disableScroll;
 
       const dialog = new Dialog(options);
