@@ -41,20 +41,31 @@ const Dialogs = (() => {
     return true;
   };
 
-  // prevent nested dialogs
+  // prevent invisible elements and nested dialogs
   const queryFilter = (component, selectors) => {
     const nestedComponents = component.querySelectorAll(NESTED_ATTRIBUTE_PARSER);
+    const visibleElements = [];
     const elements = [];
     let isValidated = true;
 
-    if (nestedComponents.length === 0) return selectors;
-
+    // save all visible elements
     selectors.forEach((selector) => {
+      const bounding = selector.getBoundingClientRect();
+      const isVisible = bounding.width > 0 || bounding.height > 0;
+
+      if (isVisible) visibleElements.push(selector);
+    });
+
+    // if no nested dialogs, return previous visible elements
+    if (nestedComponents.length === 0) return visibleElements;
+
+    // prevent nested dialogs
+    visibleElements.forEach((visibleElement) => {
       nestedComponents.forEach((nestedComponent) => {
-        if (nestedComponent.contains(selector)) isValidated = false;
+        if (nestedComponent.contains(visibleElement)) isValidated = false;
       });
 
-      if (isValidated) elements.push(selector);
+      if (isValidated) elements.push(visibleElement);
       isValidated = true;
     });
 
