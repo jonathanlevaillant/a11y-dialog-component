@@ -217,13 +217,14 @@ const Dialogs = (() => {
         this.trigger.classList.remove(this.triggerActiveClass);
       }
 
+      if (this.isShown) this.document.classList.remove(this.documentDisabledClass);
+
       this.dialog.removeAttribute('role');
       this.dialog.removeAttribute('tabindex');
       this.dialog.removeAttribute('aria-hidden');
       this.dialog.removeAttribute('aria-modal');
       this.dialog.removeAttribute('aria-labelledby');
       this.dialog.removeAttribute('aria-describedby');
-      this.document.classList.remove(this.documentDisabledClass);
     }
 
     // update aria attributes and classes
