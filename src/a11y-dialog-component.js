@@ -228,14 +228,14 @@ const Dialogs = (() => {
     }
 
     // update aria attributes and classes
-    setAttributes() {
+    setAttributes(init = false) {
       this.dialog.setAttribute('aria-hidden', !this.isShown);
 
       if (this.trigger && this.isShown) this.trigger.classList.add(this.triggerActiveClass);
       if (this.trigger && !this.isShown) this.trigger.classList.remove(this.triggerActiveClass);
 
       if (this.disableScroll && this.isShown) this.document.classList.add(this.documentDisabledClass);
-      if (this.disableScroll && !this.isShown) this.document.classList.remove(this.documentDisabledClass);
+      if (!init && this.disableScroll && !this.isShown) this.document.classList.remove(this.documentDisabledClass);
     }
 
     // delete all data attributes if the dialog is destroyed
@@ -326,7 +326,7 @@ const Dialogs = (() => {
       this.addAttributes();
       this.addObserver();
 
-      this.isShown ? this.show() : this.setAttributes();
+      this.isShown ? this.show() : this.setAttributes(true);
 
       if (this.trigger) {
         this.trigger.addEventListener('click', this.toggle);
