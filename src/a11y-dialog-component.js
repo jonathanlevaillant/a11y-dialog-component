@@ -154,22 +154,14 @@ const Dialogs = (() => {
 
     addEventListeners() {
       document.addEventListener('click', this.onClick);
-      document.addEventListener('touchstart', this.onClick);
       this.dialog.addEventListener('keydown', this.onKeydown);
-      this.dismissTriggers.forEach((dismissTrigger) => {
-        dismissTrigger.addEventListener('click', this.hide);
-        dismissTrigger.addEventListener('touchstart', this.hide);
-      });
+      this.dismissTriggers.forEach(dismissTrigger => dismissTrigger.addEventListener('click', this.hide));
     }
 
     removeEventListeners() {
       document.removeEventListener('click', this.onClick);
-      document.removeEventListener('touchstart', this.onClick);
       this.dialog.removeEventListener('keydown', this.onKeydown);
-      this.dismissTriggers.forEach((dismissTrigger) => {
-        dismissTrigger.removeEventListener('click', this.hide);
-        dismissTrigger.removeEventListener('touchstart', this.hide);
-      });
+      this.dismissTriggers.forEach(dismissTrigger => dismissTrigger.removeEventListener('click', this.hide));
     }
 
     // required to update dismiss triggers and focusable elements if a dialog is created in JS
@@ -316,10 +308,7 @@ const Dialogs = (() => {
       this.removeEventListeners();
       this.removeObserver();
 
-      if (this.trigger) {
-        this.trigger.removeEventListener('click', this.toggle);
-        this.trigger.removeEventListener('touchstart', this.toggle);
-      }
+      if (this.trigger) this.trigger.removeEventListener('click', this.toggle);
     }
 
     create() {
@@ -328,10 +317,7 @@ const Dialogs = (() => {
 
       this.isShown ? this.show() : this.setAttributes(true);
 
-      if (this.trigger) {
-        this.trigger.addEventListener('click', this.toggle);
-        this.trigger.addEventListener('touchstart', this.toggle);
-      }
+      if (this.trigger) this.trigger.addEventListener('click', this.toggle);
     }
   }
 
