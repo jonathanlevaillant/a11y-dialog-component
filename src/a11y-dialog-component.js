@@ -153,7 +153,7 @@ const Dialogs = (() => {
     }
 
     addEventListeners() {
-      document.addEventListener('click', this.onClick);
+      document.addEventListener('click', this.onClick, { capture: true });
       this.dialog.addEventListener('keydown', this.onKeydown);
       this.dismissTriggers.forEach(dismissTrigger => dismissTrigger.addEventListener('click', this.hide));
     }
