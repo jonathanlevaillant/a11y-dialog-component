@@ -126,6 +126,8 @@ const Dialogs = (() => {
       this.toggle = this.toggle.bind(this);
       this.onClick = this.onClick.bind(this);
       this.onKeydown = this.onKeydown.bind(this);
+
+      this.focusTimeout = 200;
     }
 
     onClick(event) {
@@ -270,7 +272,7 @@ const Dialogs = (() => {
 
     // required for the non-modal dialogs (F6 key)
     switchFocus() {
-      window.setTimeout(() => this.restoreFocus(), 100);
+      window.setTimeout(() => this.restoreFocus(), this.focusTimeout);
     }
 
     show(event) {
@@ -281,7 +283,7 @@ const Dialogs = (() => {
       this.setAttributes();
       this.addEventListeners();
 
-      window.setTimeout(() => this.setFocus(), 100);
+      window.setTimeout(() => this.setFocus(), this.focusTimeout);
     }
 
     hide(event, restoreFocus = true) {
@@ -292,7 +294,7 @@ const Dialogs = (() => {
       this.setAttributes();
       this.removeEventListeners();
 
-      if (restoreFocus) window.setTimeout(() => this.restoreFocus(), 100);
+      if (restoreFocus) window.setTimeout(() => this.restoreFocus(), this.focusTimeout);
     }
 
     // required for the tooltip and non-modal dialogs
