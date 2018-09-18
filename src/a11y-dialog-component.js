@@ -6,10 +6,11 @@ const Dialogs = (() => {
   const DATA_DISMISS = '[data-dialog-hide]';
   const NESTED_ATTRIBUTE_PARSER = '[role="dialog"]';
 
-  const CLASS_NAMES = {
+  const DEFAULT_CONFIG = {
     documentClass: 'js-document',
     documentDisabledClass: 'is-disabled',
     triggerActiveClass: 'is-active',
+    enableIosSupport: false,
   };
 
   const KEY_CODES = {
@@ -121,13 +122,16 @@ const Dialogs = (() => {
       this.documentDisabledClass = options.documentDisabledClass;
       this.triggerActiveClass = options.triggerActiveClass;
 
+      this.enableIosSupport = options.enableIosSupport;
+      this.scrollPosition = 0;
+
+      this.transitionDuration = options.transitionDuration;
+
       this.show = this.show.bind(this);
       this.hide = this.hide.bind(this);
       this.toggle = this.toggle.bind(this);
       this.onClick = this.onClick.bind(this);
       this.onKeydown = this.onKeydown.bind(this);
-
-      this.focusTimeout = 200;
     }
 
     onClick(event) {
@@ -228,8 +232,18 @@ const Dialogs = (() => {
       if (this.trigger && this.isShown) this.trigger.classList.add(this.triggerActiveClass);
       if (this.trigger && !this.isShown) this.trigger.classList.remove(this.triggerActiveClass);
 
-      if (this.disableScroll && this.isShown) this.document.classList.add(this.documentDisabledClass);
-      if (!init && this.disableScroll && !this.isShown) this.document.classList.remove(this.documentDisabledClass);
+      if (this.disableScroll && this.isShown) {
+        if (this.enableIosSupport) {
+          this.scrollPosition = window.scrollY;
+          window.setTimeout(() => this.document.classList.add(this.documentDisabledClass), this.transitionDuration);
+        } else {
+          this.document.classList.add(this.documentDisabledClass);
+        }
+      }
+      if (!init && this.disableScroll && !this.isShown) {
+        this.document.classList.remove(this.documentDisabledClass);
+        if (this.enableIosSupport) window.scrollTo(0, this.scrollPosition);
+      }
     }
 
     // delete all data attributes if the dialog is destroyed
@@ -272,7 +286,7 @@ const Dialogs = (() => {
 
     // required for the non-modal dialogs (F6 key)
     switchFocus() {
-      window.setTimeout(() => this.restoreFocus(), this.focusTimeout);
+      window.setTimeout(() => this.restoreFocus(), this.transitionDuration);
     }
 
     show(event) {
@@ -283,7 +297,7 @@ const Dialogs = (() => {
       this.setAttributes();
       this.addEventListeners();
 
-      window.setTimeout(() => this.setFocus(), this.focusTimeout);
+      window.setTimeout(() => this.setFocus(), this.transitionDuration);
     }
 
     hide(event, restoreFocus = true) {
@@ -294,7 +308,7 @@ const Dialogs = (() => {
       this.setAttributes();
       this.removeEventListeners();
 
-      if (restoreFocus) window.setTimeout(() => this.restoreFocus(), this.focusTimeout);
+      if (restoreFocus) window.setTimeout(() => this.restoreFocus(), this.transitionDuration);
     }
 
     // required for the tooltip and non-modal dialogs
@@ -323,14 +337,14 @@ const Dialogs = (() => {
     }
   }
 
-  // save all custom classes
-  let customClassNames;
+  // save all custom options
+  let customOptions;
 
-  const init = (config = CLASS_NAMES) => {
+  const init = (config = DEFAULT_CONFIG) => {
     const triggers = document.querySelectorAll(DATA_COMPONENT);
-    const options = { ...CLASS_NAMES, ...config };
+    const options = { ...DEFAULT_CONFIG, ...config };
 
-    customClassNames = { ...options };
+    customOptions = { ...options };
 
     triggers.forEach((trigger) => {
       if (exists(trigger.dataset.target)) {
@@ -346,6 +360,8 @@ const Dialogs = (() => {
         options.tooltip = trigger.dataset.tooltip === 'true';
         options.backdrop = options.tooltip ? false : trigger.dataset.backdrop !== 'false';
         options.disableScroll = trigger.dataset.disableScroll !== 'false';
+
+        options.transitionDuration = trigger.dataset.transitionDuration ? parseInt(trigger.dataset.transitionDuration, 10) : 200;
 
         const dialog = new Dialog(options);
         dialog.create();
@@ -365,8 +381,9 @@ const Dialogs = (() => {
     tooltip = false,
     backdrop = true,
     disableScroll = true,
+    transitionDuration = 200,
   } = {}) => {
-    const options = { ...customClassNames };
+    const options = { ...customOptions };
 
     if (exists(dialogId) && (!triggerId || exists(triggerId))) {
       const currentTrigger = document.getElementById(triggerId);
@@ -391,6 +408,8 @@ const Dialogs = (() => {
       options.tooltip = tooltip;
       options.backdrop = tooltip ? false : backdrop;
       options.disableScroll = disableScroll;
+
+      options.transitionDuration = transitionDuration;
 
       const dialog = new Dialog(options);
       dialog.create();
