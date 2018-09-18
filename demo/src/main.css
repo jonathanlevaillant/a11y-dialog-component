@@ -41,7 +41,7 @@ p:first-child {
 }
 
 /* document */
-.c-document.is-inactive {
+.c-document.is-disabled {
   overflow: hidden;
 }
 
