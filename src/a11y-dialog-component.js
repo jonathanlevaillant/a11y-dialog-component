@@ -6,11 +6,11 @@ const Dialogs = (() => {
   const DATA_DISMISS = '[data-dialog-hide]';
   const NESTED_ATTRIBUTE_PARSER = '[role="dialog"]';
 
-  const DEFAULT_CONFIG = {
+  const CLASS_NAMES = {
     documentClass: 'js-document',
     documentDisabledClass: 'is-disabled',
+    documentFixedClass: 'is-fixed',
     triggerActiveClass: 'is-active',
-    enableIosSupport: false,
   };
 
   const KEY_CODES = {
@@ -120,6 +120,7 @@ const Dialogs = (() => {
 
       this.document = document.getElementsByClassName(options.documentClass)[0] || document.querySelector('html');
       this.documentDisabledClass = options.documentDisabledClass;
+      this.documentFixedClass = options.documentFixedClass;
       this.triggerActiveClass = options.triggerActiveClass;
 
       this.enableIosSupport = options.enableIosSupport;
@@ -233,16 +234,22 @@ const Dialogs = (() => {
       if (this.trigger && !this.isShown) this.trigger.classList.remove(this.triggerActiveClass);
 
       if (this.disableScroll && this.isShown) {
+        // ios fix
         if (this.enableIosSupport) {
           this.scrollPosition = window.scrollY;
-          window.setTimeout(() => this.document.classList.add(this.documentDisabledClass), this.transitionDuration);
-        } else {
-          this.document.classList.add(this.documentDisabledClass);
+          window.setTimeout(() => this.document.classList.add(this.documentFixedClass), this.transitionDuration);
         }
+
+        this.document.classList.add(this.documentDisabledClass);
       }
       if (!init && this.disableScroll && !this.isShown) {
         this.document.classList.remove(this.documentDisabledClass);
-        if (this.enableIosSupport) window.scrollTo(0, this.scrollPosition);
+
+        // ios fix
+        if (this.enableIosSupport) {
+          this.document.classList.remove(this.documentFixedClass);
+          window.scrollTo(0, this.scrollPosition);
+        }
       }
     }
 
@@ -337,14 +344,14 @@ const Dialogs = (() => {
     }
   }
 
-  // save all custom options
-  let customOptions;
+  // save all custom classes
+  let customClassNames;
 
-  const init = (config = DEFAULT_CONFIG) => {
+  const init = (config = CLASS_NAMES) => {
     const triggers = document.querySelectorAll(DATA_COMPONENT);
-    const options = { ...DEFAULT_CONFIG, ...config };
+    const options = { ...CLASS_NAMES, ...config };
 
-    customOptions = { ...options };
+    customClassNames = { ...options };
 
     triggers.forEach((trigger) => {
       if (exists(trigger.dataset.target)) {
@@ -360,6 +367,8 @@ const Dialogs = (() => {
         options.tooltip = trigger.dataset.tooltip === 'true';
         options.backdrop = options.tooltip ? false : trigger.dataset.backdrop !== 'false';
         options.disableScroll = trigger.dataset.disableScroll !== 'false';
+
+        options.enableIosSupport = trigger.dataset.enableIosSupport === 'true';
 
         options.transitionDuration = trigger.dataset.transitionDuration ? parseInt(trigger.dataset.transitionDuration, 10) : 200;
 
@@ -381,9 +390,10 @@ const Dialogs = (() => {
     tooltip = false,
     backdrop = true,
     disableScroll = true,
+    enableIosSupport = false,
     transitionDuration = 200,
   } = {}) => {
-    const options = { ...customOptions };
+    const options = { ...customClassNames };
 
     if (exists(dialogId) && (!triggerId || exists(triggerId))) {
       const currentTrigger = document.getElementById(triggerId);
@@ -408,6 +418,8 @@ const Dialogs = (() => {
       options.tooltip = tooltip;
       options.backdrop = tooltip ? false : backdrop;
       options.disableScroll = disableScroll;
+
+      options.enableIosSupport = enableIosSupport;
 
       options.transitionDuration = transitionDuration;
 
