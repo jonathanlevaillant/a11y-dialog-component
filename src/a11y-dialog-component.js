@@ -116,16 +116,16 @@ const Dialogs = (() => {
       this.modal = options.modal;
       this.tooltip = options.tooltip;
       this.backdrop = options.backdrop;
+
       this.disableScroll = options.disableScroll;
+      this.disableIosScroll = options.disableIosScroll;
 
       this.document = document.getElementsByClassName(options.documentClass)[0] || document.querySelector('html');
       this.documentDisabledClass = options.documentDisabledClass;
       this.documentFixedClass = options.documentFixedClass;
       this.triggerActiveClass = options.triggerActiveClass;
 
-      this.enableIosSupport = options.enableIosSupport;
       this.scrollPosition = 0;
-
       this.transitionDuration = options.transitionDuration;
 
       this.show = this.show.bind(this);
@@ -237,21 +237,24 @@ const Dialogs = (() => {
       if (this.trigger && !this.isShown) this.trigger.classList.remove(this.triggerActiveClass);
 
       if (this.disableScroll && this.isShown) {
-        // ios fix
-        if (this.enableIosSupport) {
+        if (this.disableIosScroll) {
           this.scrollPosition = window.scrollY;
-          window.setTimeout(() => this.document.classList.add(this.documentFixedClass), this.transitionDuration);
-        }
 
-        this.document.classList.add(this.documentDisabledClass);
+          window.setTimeout(() => {
+            this.document.classList.add(this.documentDisabledClass);
+            this.document.classList.add(this.documentFixedClass);
+          }, this.transitionDuration);
+        } else {
+          this.document.classList.add(this.documentDisabledClass);
+        }
       }
       if (!init && this.disableScroll && !this.isShown) {
-        this.document.classList.remove(this.documentDisabledClass);
-
-        // ios fix
-        if (this.enableIosSupport) {
+        if (this.disableIosScroll) {
+          this.document.classList.remove(this.documentDisabledClass);
           this.document.classList.remove(this.documentFixedClass);
           window.scrollTo(0, this.scrollPosition);
+        } else {
+          this.document.classList.remove(this.documentDisabledClass);
         }
       }
     }
@@ -369,9 +372,9 @@ const Dialogs = (() => {
         options.modal = trigger.dataset.modal !== 'false';
         options.tooltip = trigger.dataset.tooltip === 'true';
         options.backdrop = options.tooltip ? false : trigger.dataset.backdrop !== 'false';
-        options.disableScroll = trigger.dataset.disableScroll !== 'false';
 
-        options.enableIosSupport = trigger.dataset.enableIosSupport === 'true';
+        options.disableScroll = trigger.dataset.disableScroll !== 'false';
+        options.disableIosScroll = trigger.dataset.disableIosScroll === 'true';
 
         options.transitionDuration = trigger.dataset.transitionDuration ? parseInt(trigger.dataset.transitionDuration, 10) : 200;
 
@@ -393,7 +396,7 @@ const Dialogs = (() => {
     tooltip = false,
     backdrop = true,
     disableScroll = true,
-    enableIosSupport = false,
+    disableIosScroll = false,
     transitionDuration = 200,
   } = {}) => {
     const options = { ...customClassNames };
@@ -420,9 +423,9 @@ const Dialogs = (() => {
       options.modal = modal;
       options.tooltip = tooltip;
       options.backdrop = tooltip ? false : backdrop;
-      options.disableScroll = disableScroll;
 
-      options.enableIosSupport = enableIosSupport;
+      options.disableScroll = disableScroll;
+      options.disableIosScroll = disableIosScroll;
 
       options.transitionDuration = transitionDuration;
 
