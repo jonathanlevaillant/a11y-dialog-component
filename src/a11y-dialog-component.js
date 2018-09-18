@@ -216,7 +216,10 @@ const Dialogs = (() => {
         this.trigger.classList.remove(this.triggerActiveClass);
       }
 
-      if (this.isShown) this.document.classList.remove(this.documentDisabledClass);
+      if (this.isShown) {
+        this.document.classList.remove(this.documentDisabledClass);
+        this.document.classList.remove(this.documentFixedClass);
+      }
 
       this.dialog.removeAttribute('role');
       this.dialog.removeAttribute('tabindex');
