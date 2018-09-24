@@ -29,6 +29,7 @@ const Dialogs = (() => {
     constructor(options) {
       this.dialog = options.dialog;
       this.triggers = options.triggers;
+      this.currentTrigger = null;
       this.labelledby = options.labelledby;
       this.describedby = options.describedby;
       this.isOpen = options.open;
@@ -91,7 +92,10 @@ const Dialogs = (() => {
       window.setTimeout(() => this.firstFocusableElement.focus(), this.transitionDuration);
     }
 
-    // set focus trap
+    restoreFocus() {
+      if (this.currentTrigger) window.setTimeout(() => this.currentTrigger.focus(), this.transitionDuration);
+    }
+
     maintainFocus(event) {
       if (event.shiftKey && event.target === this.firstFocusableElement) {
         event.preventDefault();
@@ -117,10 +121,14 @@ const Dialogs = (() => {
 
       this.setAttributes();
       this.removeEventListeners();
+      this.restoreFocus();
     }
 
-    toggle() {
+    toggle(event) {
       this.isOpen ? this.close() : this.open();
+
+      // save the current trigger
+      this.currentTrigger = event.currentTarget;
     }
 
     create() {
