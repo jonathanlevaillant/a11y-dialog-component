@@ -3,21 +3,10 @@
 
 const Dialogs = (() => {
   const DATA_COMPONENT = '[data-component="dialog"]';
-  const DATA_DISMISS = '[data-dialog-hide]';
-  const NESTED_ATTRIBUTE_PARSER = '[role="dialog"]';
+  const DATA_TRIGGER = '[data-dialog-trigger]';
 
-  const CLASS_NAMES = {
-    documentClass: 'js-document',
-    documentDisabledClass: 'is-disabled',
-    documentFixedClass: 'is-fixed',
-    triggerActiveClass: 'is-active',
-  };
-
-  const KEY_CODES = {
-    tab: 9,
-    enter: 13,
-    escape: 27,
-    f6: 117,
+  const DEFAULT_CONFIG = {
+    transitionDuration: 200,
   };
 
   const FOCUSABLE_ELEMENTS = [
@@ -31,125 +20,31 @@ const Dialogs = (() => {
     '[contenteditable="true"]:not([tabindex^="-"])',
   ];
 
-  const DIALOGS = [];
-
-  // check if the ID exists
-  const exists = (id) => {
-    if (!document.getElementById(id)) {
-      console.warn(`a11y-dialog-component: ID '${id}' is not defined`);
-      return false;
-    }
-    return true;
-  };
-
-  // prevent invisible elements and nested dialogs
-  const queryFilter = (component, selectors) => {
-    const nestedComponents = component.querySelectorAll(NESTED_ATTRIBUTE_PARSER);
-    const visibleElements = [];
-    const elements = [];
-    let isValidated = true;
-
-    // save all visible elements
-    selectors.forEach((selector) => {
-      const bounding = selector.getBoundingClientRect();
-      const isVisible = bounding.width > 0 || bounding.height > 0;
-
-      if (isVisible) visibleElements.push(selector);
-    });
-
-    // if no nested dialogs, return previous visible elements
-    if (nestedComponents.length === 0) return visibleElements;
-
-    // prevent nested dialogs
-    visibleElements.forEach((visibleElement) => {
-      nestedComponents.forEach((nestedComponent) => {
-        if (nestedComponent.contains(visibleElement)) isValidated = false;
-      });
-
-      if (isValidated) elements.push(visibleElement);
-      isValidated = true;
-    });
-
-    return elements;
-  };
-
-  // return a dialog
-  const getDialog = (dialogId) => {
-    let myDialog = false;
-
-    DIALOGS.forEach((dialog) => {
-      if (dialogId === dialog.dialog.id) myDialog = dialog;
-    });
-
-    return myDialog;
-  };
-
-  // destroy a dialog and remove it from array
-  const destroyDialog = (dialogId) => {
-    let isDeleted = false;
-
-    DIALOGS.forEach((dialog, index) => {
-      if (dialogId === dialog.dialog.id) {
-        dialog.destroy();
-
-        DIALOGS.splice(index, 1);
-        isDeleted = true;
-      }
-    });
-
-    if (!isDeleted) console.warn(`a11y-dialog-component: ID '${dialogId}' is not a registered dialog`);
+  const KEY_CODES = {
+    tab: 9,
+    escape: 27,
   };
 
   class Dialog {
     constructor(options) {
-      this.trigger = options.trigger;
       this.dialog = options.dialog;
-      this.dismissTriggers = queryFilter(this.dialog, this.dialog.querySelectorAll(DATA_DISMISS));
+      this.triggers = options.triggers;
       this.labelledby = options.labelledby;
       this.describedby = options.describedby;
-
-      this.focusableElements = queryFilter(this.dialog, this.dialog.querySelectorAll(FOCUSABLE_ELEMENTS));
-      [this.firstFocusableElement] = this.focusableElements;
-      this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
-
-      this.isShown = options.show;
-      this.modal = options.modal;
-      this.tooltip = options.tooltip;
-      this.backdrop = options.backdrop;
-
-      this.disableScroll = options.disableScroll;
-      this.disableIosScroll = options.disableIosScroll;
-
-      this.document = document.getElementsByClassName(options.documentClass)[0] || document.querySelector('html');
-      this.documentDisabledClass = options.documentDisabledClass;
-      this.documentFixedClass = options.documentFixedClass;
-      this.triggerActiveClass = options.triggerActiveClass;
-
-      this.scrollPosition = 0;
+      this.isOpen = options.open;
       this.transitionDuration = options.transitionDuration;
+      this.focusableElements = [];
+      this.firstFocusableElement = [];
+      this.lastFocusableElement = [];
 
-      this.show = this.show.bind(this);
-      this.hide = this.hide.bind(this);
       this.toggle = this.toggle.bind(this);
-      this.onClick = this.onClick.bind(this);
       this.onKeydown = this.onKeydown.bind(this);
-    }
-
-    onClick(event) {
-      const dialogArea = `#${this.dialog.id}, ${DATA_COMPONENT}[data-target="${this.dialog.id}"]`;
-
-      if (this.backdrop && event.target === this.dialog) this.hide();
-      if (this.tooltip && !event.target.closest(dialogArea)) this.hide(event, false);
     }
 
     onKeydown(event) {
       switch (event.which) {
         case KEY_CODES.escape:
-          event.stopPropagation();
-          this.hide();
-          break;
-        case KEY_CODES.f6:
-          if (!this.modal) !this.tooltip ? this.switchFocus() : this.hide();
+          this.close();
           break;
         case KEY_CODES.tab:
           this.maintainFocus(event);
@@ -160,132 +55,44 @@ const Dialogs = (() => {
     }
 
     addEventListeners() {
-      document.addEventListener('click', this.onClick, { capture: true });
       this.dialog.addEventListener('keydown', this.onKeydown);
-      this.dismissTriggers.forEach(dismissTrigger => dismissTrigger.addEventListener('click', this.hide));
     }
 
     removeEventListeners() {
-      document.removeEventListener('click', this.onClick, { capture: true });
       this.dialog.removeEventListener('keydown', this.onKeydown);
-      this.dismissTriggers.forEach(dismissTrigger => dismissTrigger.removeEventListener('click', this.hide));
     }
 
-    // required to update dismiss triggers and focusable elements if a dialog is created in JS
-    observer() {
-      return new MutationObserver((mutations) => {
-        mutations.forEach(() => {
-          this.dismissTriggers = queryFilter(this.dialog, this.dialog.querySelectorAll(DATA_DISMISS));
-
-          this.focusableElements = queryFilter(this.dialog, this.dialog.querySelectorAll(FOCUSABLE_ELEMENTS));
-          [this.firstFocusableElement] = this.focusableElements;
-          this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
-        });
-      });
-    }
-
-    addObserver() {
-      const observer = this.observer();
-      const config = { attributes: true, attributeFilter: ['role'], subtree: true };
-
-      observer.observe(this.dialog, config);
-    }
-
-    removeObserver() {
-      const observer = this.observer();
-
-      observer.disconnect();
-    }
-
-    // add aria attributes based on data attributes
     addAttributes() {
-      if (this.trigger) this.trigger.setAttribute('aria-haspopup', 'dialog');
-
       this.dialog.setAttribute('role', 'dialog');
       this.dialog.setAttribute('tabindex', -1);
+      this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
-      if (this.modal) this.dialog.setAttribute('aria-modal', true);
+      this.triggers.forEach((trigger) => {
+        trigger.setAttribute('aria-haspopup', 'dialog');
+      });
 
       if (this.labelledby) this.dialog.setAttribute('aria-labelledby', this.labelledby);
       if (this.describedby) this.dialog.setAttribute('aria-describedby', this.describedby);
     }
 
-    removeAttributes() {
-      if (this.trigger) {
-        this.trigger.removeAttribute('aria-haspopup');
-        this.trigger.classList.remove(this.triggerActiveClass);
-      }
-
-      if (this.isShown) {
-        this.document.classList.remove(this.documentDisabledClass);
-        this.document.classList.remove(this.documentFixedClass);
-      }
-
-      this.dialog.removeAttribute('role');
-      this.dialog.removeAttribute('tabindex');
-      this.dialog.removeAttribute('aria-hidden');
-      this.dialog.removeAttribute('aria-modal');
-      this.dialog.removeAttribute('aria-labelledby');
-      this.dialog.removeAttribute('aria-describedby');
+    setAttributes() {
+      this.dialog.setAttribute('aria-hidden', !this.isOpen);
     }
 
-    // update aria attributes and classes
-    setAttributes(init = false) {
-      this.dialog.setAttribute('aria-hidden', !this.isShown);
+    setFocusableElements() {
+      const focusableElement = this.dialog.querySelectorAll(FOCUSABLE_ELEMENTS);
 
-      if (this.trigger && this.isShown) this.trigger.classList.add(this.triggerActiveClass);
-      if (this.trigger && !this.isShown) this.trigger.classList.remove(this.triggerActiveClass);
-
-      if (this.disableScroll && this.isShown) {
-        if (this.disableIosScroll) {
-          this.scrollPosition = window.scrollY;
-
-          window.setTimeout(() => {
-            this.document.classList.add(this.documentDisabledClass);
-            this.document.classList.add(this.documentFixedClass);
-          }, this.transitionDuration);
-        } else {
-          this.document.classList.add(this.documentDisabledClass);
-        }
-      }
-      if (!init && this.disableScroll && !this.isShown) {
-        if (this.disableIosScroll) {
-          this.document.classList.remove(this.documentDisabledClass);
-          this.document.classList.remove(this.documentFixedClass);
-          window.scrollTo(0, this.scrollPosition);
-        } else {
-          this.document.classList.remove(this.documentDisabledClass);
-        }
-      }
-    }
-
-    // delete all data attributes if the dialog is destroyed
-    removeDataAttributes() {
-      if (this.trigger) {
-        delete this.trigger.dataset.component;
-        delete this.trigger.dataset.target;
-        delete this.trigger.dataset.labelledby;
-        delete this.trigger.dataset.describedby;
-        delete this.trigger.dataset.show;
-        delete this.trigger.dataset.modal;
-        delete this.trigger.dataset.tooltip;
-        delete this.trigger.dataset.backdrop;
-        delete this.trigger.dataset.disableScroll;
-      }
+      this.focusableElements = focusableElement.length > 0 ? focusableElement : [this.dialog];
+      [this.firstFocusableElement] = this.focusableElements;
+      this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
     }
 
     setFocus() {
-      this.focusableElements.length > 0 ? this.firstFocusableElement.focus() : this.dialog.focus();
+      window.setTimeout(() => this.firstFocusableElement.focus(), this.transitionDuration);
     }
 
-    restoreFocus() {
-      if (this.trigger) this.trigger.focus();
-    }
-
-    // focus trap
+    // set focus trap
     maintainFocus(event) {
-      if (this.focusableElements.length === 0) return;
-
       if (event.shiftKey && event.target === this.firstFocusableElement) {
         event.preventDefault();
         this.lastFocusableElement.focus();
@@ -297,175 +104,70 @@ const Dialogs = (() => {
       }
     }
 
-    // required for the non-modal dialogs (F6 key)
-    switchFocus() {
-      window.setTimeout(() => this.restoreFocus(), this.transitionDuration);
-    }
-
-    show(event) {
-      if (event) event.preventDefault();
-
-      this.isShown = true;
+    open() {
+      this.isOpen = true;
 
       this.setAttributes();
       this.addEventListeners();
-
-      window.setTimeout(() => this.setFocus(), this.transitionDuration);
+      this.setFocus();
     }
 
-    hide(event, restoreFocus = true) {
-      if (event && restoreFocus) event.preventDefault();
-
-      this.isShown = false;
+    close() {
+      this.isOpen = false;
 
       this.setAttributes();
       this.removeEventListeners();
-
-      if (restoreFocus) window.setTimeout(() => this.restoreFocus(), this.transitionDuration);
     }
 
-    // required for the tooltip and non-modal dialogs
-    toggle(event) {
-      this.isShown = !this.isShown;
-
-      this.isShown ? this.show(event) : this.hide(event);
-    }
-
-    destroy() {
-      this.removeAttributes();
-      this.removeDataAttributes();
-      this.removeEventListeners();
-      this.removeObserver();
-
-      if (this.trigger) this.trigger.removeEventListener('click', this.toggle);
+    toggle() {
+      this.isOpen ? this.close() : this.open();
     }
 
     create() {
       this.addAttributes();
-      this.addObserver();
+      this.setFocusableElements();
 
-      this.isShown ? this.show() : this.setAttributes(true);
+      // if "isOpen" parameter is set to true when the dialog is created, then, open it
+      if (this.isOpen) this.open();
 
-      if (this.trigger) this.trigger.addEventListener('click', this.toggle);
+      // add event listener to each trigger linked to dialog
+      this.triggers.forEach((trigger) => {
+        trigger.addEventListener('click', this.toggle);
+      });
     }
   }
 
-  // save all custom classes
-  let customClassNames;
+  const init = (config = DEFAULT_CONFIG) => {
+    const dialogs = document.querySelectorAll(DATA_COMPONENT);
+    const triggers = document.querySelectorAll(DATA_TRIGGER);
+    const options = { ...DEFAULT_CONFIG, ...config };
 
-  const init = (config = CLASS_NAMES) => {
-    const triggers = document.querySelectorAll(DATA_COMPONENT);
-    const options = { ...CLASS_NAMES, ...config };
+    dialogs.forEach((dialog) => {
+      const { transitionDuration } = dialog.dataset;
 
-    customClassNames = { ...options };
+      options.dialog = dialog;
+      options.triggers = [];
+      options.labelledby = dialog.dataset.labelledby;
+      options.describedby = dialog.dataset.describedby;
+      options.open = dialog.dataset.open === 'true';
 
-    triggers.forEach((trigger) => {
-      if (exists(trigger.dataset.target)) {
-        const currentDialog = document.getElementById(trigger.dataset.target);
+      // set custom transition duration if exists
+      if (transitionDuration) options.transitionDuration = parseInt(transitionDuration, 10);
 
-        options.trigger = trigger;
-        options.dialog = currentDialog;
-        options.labelledby = trigger.dataset.labelledby;
-        options.describedby = trigger.dataset.describedby;
+      // if one or some triggers are linked to dialog, just add them to dialog options
+      triggers.forEach((trigger) => {
+        if (trigger.dataset.dialogTrigger === dialog.id) {
+          options.triggers.push(trigger);
+        }
+      });
 
-        options.show = trigger.dataset.show === 'true';
-        options.modal = trigger.dataset.modal !== 'false';
-        options.tooltip = trigger.dataset.tooltip === 'true';
-        options.backdrop = options.tooltip ? false : trigger.dataset.backdrop !== 'false';
-
-        options.disableScroll = trigger.dataset.disableScroll !== 'false';
-        options.disableIosScroll = trigger.dataset.disableIosScroll === 'true';
-
-        options.transitionDuration = trigger.dataset.transitionDuration ? parseInt(trigger.dataset.transitionDuration, 10) : 200;
-
-        const dialog = new Dialog(options);
-        dialog.create();
-
-        // save each created dialogs
-        DIALOGS.push(dialog);
-      }
+      // create the dialog with previous options
+      const currentDialog = new Dialog(options);
+      currentDialog.create();
     });
   };
 
-  const create = (dialogId, {
-    triggerId = null,
-    labelledbyId = null,
-    describedbyId = null,
-    show = false,
-    modal = true,
-    tooltip = false,
-    backdrop = true,
-    disableScroll = true,
-    disableIosScroll = false,
-    transitionDuration = 200,
-  } = {}) => {
-    const options = { ...customClassNames };
-
-    if (exists(dialogId) && (!triggerId || exists(triggerId))) {
-      const currentTrigger = document.getElementById(triggerId);
-      const currentDialog = document.getElementById(dialogId);
-      const duplicatedDialog = getDialog(dialogId);
-
-      // if a dialog already exists, destroy oldest and keep the current
-      if (duplicatedDialog) destroyDialog(duplicatedDialog.dialog.id);
-
-      if (triggerId) {
-        currentTrigger.dataset.component = 'dialog';
-        currentTrigger.dataset.target = dialogId;
-      }
-
-      options.trigger = currentTrigger;
-      options.dialog = currentDialog;
-      options.labelledby = labelledbyId;
-      options.describedby = describedbyId;
-
-      options.show = show;
-      options.modal = modal;
-      options.tooltip = tooltip;
-      options.backdrop = tooltip ? false : backdrop;
-
-      options.disableScroll = disableScroll;
-      options.disableIosScroll = disableIosScroll;
-
-      options.transitionDuration = transitionDuration;
-
-      const dialog = new Dialog(options);
-      dialog.create();
-
-      // save each created dialogs
-      DIALOGS.push(dialog);
-    }
-  };
-
-  const show = (dialogId) => {
-    if (exists(dialogId)) {
-      const dialog = getDialog(dialogId);
-
-      dialog ? dialog.show() : console.warn(`a11y-dialog-component: ID '${dialogId}' is not a registered dialog`);
-    }
-  };
-
-  const hide = (dialogId) => {
-    if (exists(dialogId)) {
-      const dialog = getDialog(dialogId);
-
-      dialog ? dialog.hide() : console.warn(`a11y-dialog-component: ID '${dialogId}' is not a registered dialog`);
-    }
-  };
-
-  const destroy = (dialogId) => {
-    if (exists(dialogId)) {
-      destroyDialog(dialogId);
-    }
-  };
-
-  return {
-    init,
-    create,
-    show,
-    hide,
-    destroy,
-  };
+  return { init };
 })();
 
 export default Dialogs;
