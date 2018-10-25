@@ -26,6 +26,7 @@ const KEY_CODES = {
 };
 
 // set private methods with symbols
+const onClick = Symbol('onClick');
 const onKeydown = Symbol('onKeydown');
 const addEventListeners = Symbol('addEventListeners');
 const removeEventListeners = Symbol('removeEventListeners');
@@ -56,6 +57,7 @@ export default class Dialog {
     labelledby,
     describedby,
     modal = true,
+    backdrop = true,
     open = false,
     transitionDuration = config.transitionDuration,
   } = {}, dataComponent = false) {
@@ -68,6 +70,7 @@ export default class Dialog {
     this.labelledby = labelledby;
     this.describedby = describedby;
     this.modal = modal;
+    this.backdrop = backdrop;
     this.isOpen = open;
     this.transitionDuration = transitionDuration;
     this.focusableElements = [];
@@ -76,7 +79,12 @@ export default class Dialog {
 
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
+    this[onClick] = this[onClick].bind(this);
     this[onKeydown] = this[onKeydown].bind(this);
+  }
+
+  [onClick](event) {
+    if (this.backdrop && event.target === this.dialog) this.close();
   }
 
   [onKeydown](event) {
@@ -93,11 +101,13 @@ export default class Dialog {
   }
 
   [addEventListeners]() {
+    this.dialog.addEventListener('click', this[onClick]);
     this.dialog.addEventListener('keydown', this[onKeydown]);
     this.closeTriggers.forEach(closeTrigger => closeTrigger.addEventListener('click', this.close));
   }
 
   [removeEventListeners]() {
+    this.dialog.removeEventListener('click', this[onClick]);
     this.dialog.removeEventListener('keydown', this[onKeydown]);
     this.closeTriggers.forEach(closeTrigger => closeTrigger.removeEventListener('click', this.close));
   }
@@ -219,6 +229,7 @@ export function addDialogs() {
     parameters.labelledby = dialog.dataset.labelledby;
     parameters.describedby = dialog.dataset.describedby;
     parameters.modal = dialog.dataset.modal !== 'false';
+    parameters.backdrop = dialog.dataset.backdrop !== 'false';
     parameters.open = dialog.dataset.open === 'true';
     parameters.transitionDuration = transitionDuration ? parseInt(transitionDuration, 10) : config.transitionDuration;
 
