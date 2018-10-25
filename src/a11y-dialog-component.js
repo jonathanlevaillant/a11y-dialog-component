@@ -1,181 +1,229 @@
 /* dialogs
  ========================================================================== */
 
-const Dialogs = (() => {
-  const DATA_COMPONENT = '[data-component="dialog"]';
-  const DATA_TRIGGER = '[data-dialog-trigger]';
+const DATA_COMPONENT = '[data-component="dialog"]';
+const DATA_TRIGGER = '[data-dialog-target]';
+const DATA_CLOSE = '[data-dialog-close]';
 
-  const DEFAULT_CONFIG = {
-    transitionDuration: 200,
-  };
+const DEFAULT_CONFIG = {
+  transitionDuration: 200,
+};
 
-  const FOCUSABLE_ELEMENTS = [
-    '[href]:not([tabindex^="-"])',
-    'input:not([disabled]):not([type="hidden"]):not([tabindex^="-"]):not([type="radio"])',
-    'input[type="radio"]:checked',
-    'select:not([disabled]):not([tabindex^="-"])',
-    'textarea:not([disabled]):not([tabindex^="-"])',
-    'button:not([disabled]):not([tabindex^="-"])',
-    '[tabindex]:not([tabindex^="-"])',
-    '[contenteditable="true"]:not([tabindex^="-"])',
-  ];
+const FOCUSABLE_ELEMENTS = [
+  '[href]:not([tabindex^="-"])',
+  'input:not([disabled]):not([type="hidden"]):not([tabindex^="-"]):not([type="radio"])',
+  'input[type="radio"]:checked',
+  'select:not([disabled]):not([tabindex^="-"])',
+  'textarea:not([disabled]):not([tabindex^="-"])',
+  'button:not([disabled]):not([tabindex^="-"])',
+  '[tabindex]:not([tabindex^="-"])',
+  '[contenteditable="true"]:not([tabindex^="-"])',
+];
 
-  const KEY_CODES = {
-    tab: 9,
-    escape: 27,
-  };
+const KEY_CODES = {
+  tab: 9,
+  escape: 27,
+};
 
-  class Dialog {
-    constructor(options) {
-      this.dialog = options.dialog;
-      this.triggers = options.triggers;
-      this.currentTrigger = null;
-      this.labelledby = options.labelledby;
-      this.describedby = options.describedby;
-      this.isOpen = options.open;
-      this.transitionDuration = options.transitionDuration;
-      this.focusableElements = [];
-      this.firstFocusableElement = [];
-      this.lastFocusableElement = [];
+// set private methods with symbols
+const onKeydown = Symbol('onKeydown');
+const addEventListeners = Symbol('addEventListeners');
+const removeEventListeners = Symbol('removeEventListeners');
+const addAttributes = Symbol('addAttributes');
+const removeAttributes = Symbol('removeAttributes');
+const setAttributes = Symbol('setAttributes');
+const setFocusableElements = Symbol('setFocusableElements');
+const setFocus = Symbol('setFocus');
+const restoreFocus = Symbol('restoreFocus');
+const maintainFocus = Symbol('maintainFocus');
 
-      this.toggle = this.toggle.bind(this);
-      this.onKeydown = this.onKeydown.bind(this);
-    }
+// set the custom configuration
+let config = DEFAULT_CONFIG;
 
-    onKeydown(event) {
-      switch (event.which) {
-        case KEY_CODES.escape:
-          this.close();
-          break;
-        case KEY_CODES.tab:
-          this.maintainFocus(event);
-          break;
-        default:
-          break;
-      }
-    }
+export function setDialogs({
+  transitionDuration = config.transitionDuration,
+} = {}) {
+  config = { ...DEFAULT_CONFIG, ...{ transitionDuration } };
+}
 
-    addEventListeners() {
-      this.dialog.addEventListener('keydown', this.onKeydown);
-    }
+// core dialog class
+export default class Dialog {
+  constructor(dialogSelector, {
+    dialog = document.querySelector(dialogSelector),
+    onOpen = () => {},
+    onClose = () => {},
+    triggers = [],
+    labelledby,
+    describedby,
+    modal = true,
+    open = false,
+    transitionDuration = config.transitionDuration,
+  } = {}, dataComponent = false) {
+    this.dialog = dialog;
+    this.onOpen = onOpen;
+    this.onClose = onClose;
+    this.triggers = !dataComponent ? triggers.map(trigger => document.querySelector(trigger)) : triggers;
+    this.currentTrigger = null;
+    this.closeTriggers = this.dialog.querySelectorAll(DATA_CLOSE);
+    this.labelledby = labelledby;
+    this.describedby = describedby;
+    this.modal = modal;
+    this.isOpen = open;
+    this.transitionDuration = transitionDuration;
+    this.focusableElements = [];
+    this.firstFocusableElement = null;
+    this.lastFocusableElement = null;
 
-    removeEventListeners() {
-      this.dialog.removeEventListener('keydown', this.onKeydown);
-    }
+    this.close = this.close.bind(this);
+    this.toggle = this.toggle.bind(this);
+    this[onKeydown] = this[onKeydown].bind(this);
+  }
 
-    addAttributes() {
-      this.dialog.setAttribute('role', 'dialog');
-      this.dialog.setAttribute('tabindex', -1);
-      this.dialog.setAttribute('aria-hidden', !this.isOpen);
-
-      this.triggers.forEach((trigger) => {
-        trigger.setAttribute('aria-haspopup', 'dialog');
-      });
-
-      if (this.labelledby) this.dialog.setAttribute('aria-labelledby', this.labelledby);
-      if (this.describedby) this.dialog.setAttribute('aria-describedby', this.describedby);
-    }
-
-    setAttributes() {
-      this.dialog.setAttribute('aria-hidden', !this.isOpen);
-    }
-
-    setFocusableElements() {
-      const focusableElement = this.dialog.querySelectorAll(FOCUSABLE_ELEMENTS);
-
-      this.focusableElements = focusableElement.length > 0 ? focusableElement : [this.dialog];
-      [this.firstFocusableElement] = this.focusableElements;
-      this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
-    }
-
-    setFocus() {
-      window.setTimeout(() => this.firstFocusableElement.focus(), this.transitionDuration);
-    }
-
-    restoreFocus() {
-      if (this.currentTrigger) window.setTimeout(() => this.currentTrigger.focus(), this.transitionDuration);
-    }
-
-    maintainFocus(event) {
-      if (event.shiftKey && event.target === this.firstFocusableElement) {
-        event.preventDefault();
-        this.lastFocusableElement.focus();
-      }
-
-      if (!event.shiftKey && event.target === this.lastFocusableElement) {
-        event.preventDefault();
-        this.firstFocusableElement.focus();
-      }
-    }
-
-    open() {
-      this.isOpen = true;
-
-      this.setAttributes();
-      this.addEventListeners();
-      this.setFocus();
-    }
-
-    close() {
-      this.isOpen = false;
-
-      this.setAttributes();
-      this.removeEventListeners();
-      this.restoreFocus();
-    }
-
-    toggle(event) {
-      this.isOpen ? this.close() : this.open();
-
-      // save the current trigger
-      this.currentTrigger = event.currentTarget;
-    }
-
-    create() {
-      this.addAttributes();
-      this.setFocusableElements();
-
-      // if "isOpen" parameter is set to true when the dialog is created, then, open it
-      if (this.isOpen) this.open();
-
-      // add event listener to each trigger linked to dialog
-      this.triggers.forEach((trigger) => {
-        trigger.addEventListener('click', this.toggle);
-      });
+  [onKeydown](event) {
+    switch (event.which) {
+      case KEY_CODES.escape:
+        this.close();
+        break;
+      case KEY_CODES.tab:
+        this[maintainFocus](event);
+        break;
+      default:
+        break;
     }
   }
 
-  const init = (config = DEFAULT_CONFIG) => {
-    const dialogs = document.querySelectorAll(DATA_COMPONENT);
-    const triggers = document.querySelectorAll(DATA_TRIGGER);
-    const options = { ...DEFAULT_CONFIG, ...config };
+  [addEventListeners]() {
+    this.dialog.addEventListener('keydown', this[onKeydown]);
+    this.closeTriggers.forEach(closeTrigger => closeTrigger.addEventListener('click', this.close));
+  }
 
-    dialogs.forEach((dialog) => {
-      const { transitionDuration } = dialog.dataset;
+  [removeEventListeners]() {
+    this.dialog.removeEventListener('keydown', this[onKeydown]);
+    this.closeTriggers.forEach(closeTrigger => closeTrigger.removeEventListener('click', this.close));
+  }
 
-      options.dialog = dialog;
-      options.triggers = [];
-      options.labelledby = dialog.dataset.labelledby;
-      options.describedby = dialog.dataset.describedby;
-      options.open = dialog.dataset.open === 'true';
+  [addAttributes]() {
+    this.dialog.setAttribute('role', 'dialog');
+    this.dialog.setAttribute('tabindex', -1);
+    this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
-      // set custom transition duration if exists
-      if (transitionDuration) options.transitionDuration = parseInt(transitionDuration, 10);
+    if (this.labelledby) this.dialog.setAttribute('aria-labelledby', this.labelledby);
+    if (this.describedby) this.dialog.setAttribute('aria-describedby', this.describedby);
 
-      // if one or some triggers are linked to dialog, just add them to dialog options
-      triggers.forEach((trigger) => {
-        if (trigger.dataset.dialogTrigger === dialog.id) {
-          options.triggers.push(trigger);
-        }
-      });
+    if (this.modal) this.dialog.setAttribute('aria-modal', true);
 
-      // create the dialog with previous options
-      const currentDialog = new Dialog(options);
-      currentDialog.create();
-    });
-  };
+    this.triggers.forEach(trigger => trigger.setAttribute('aria-haspopup', 'dialog'));
+  }
 
-  return { init };
-})();
+  [removeAttributes]() {
+    this.dialog.removeAttribute('role');
+    this.dialog.removeAttribute('tabindex');
+    this.dialog.removeAttribute('aria-hidden');
+    this.dialog.removeAttribute('aria-labelledby');
+    this.dialog.removeAttribute('aria-describedby');
+    this.dialog.removeAttribute('aria-modal');
 
-export default Dialogs;
+    this.triggers.forEach(trigger => trigger.removeAttribute('aria-haspopup'));
+  }
+
+  [setAttributes]() {
+    this.dialog.setAttribute('aria-hidden', !this.isOpen);
+  }
+
+  [setFocusableElements]() {
+    const focusableElements = this.dialog.querySelectorAll(FOCUSABLE_ELEMENTS);
+
+    this.focusableElements = focusableElements.length > 0 ? focusableElements : [this.dialog];
+    [this.firstFocusableElement] = this.focusableElements;
+    this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
+  }
+
+  [setFocus]() {
+    window.setTimeout(() => this.firstFocusableElement.focus(), this.transitionDuration);
+  }
+
+  [restoreFocus]() {
+    if (this.currentTrigger) window.setTimeout(() => this.currentTrigger.focus(), this.transitionDuration);
+  }
+
+  [maintainFocus](event) {
+    if (event.shiftKey && event.target === this.firstFocusableElement) {
+      event.preventDefault();
+      this.lastFocusableElement.focus();
+    }
+
+    if (!event.shiftKey && event.target === this.lastFocusableElement) {
+      event.preventDefault();
+      this.firstFocusableElement.focus();
+    }
+  }
+
+  open() {
+    this.isOpen = true;
+
+    this[setAttributes]();
+    this[addEventListeners]();
+    this[setFocus]();
+
+    this.onOpen(this.dialog);
+  }
+
+  close() {
+    this.isOpen = false;
+
+    this[setAttributes]();
+    this[removeEventListeners]();
+    this[restoreFocus]();
+
+    this.onClose(this.dialog);
+  }
+
+  toggle(event) {
+    this.isOpen ? this.close() : this.open();
+
+    // save the current trigger if it exists
+    if (event) this.currentTrigger = event.currentTarget;
+  }
+
+  create() {
+    this[addAttributes]();
+    this[setFocusableElements]();
+
+    // if "isOpen" parameter is set to true when the dialog is created, then, open it
+    if (this.isOpen) this.open();
+
+    // add event listener to each trigger linked to dialog
+    this.triggers.forEach(trigger => trigger.addEventListener('click', this.toggle));
+  }
+
+  destroy() {
+    this[removeAttributes]();
+    this[removeEventListeners]();
+
+    // remove event listener to each trigger linked to dialog
+    this.triggers.forEach(trigger => trigger.removeEventListener('click', this.toggle));
+  }
+}
+
+// add dialogs based on data components
+export function addDialogs() {
+  const dialogs = document.querySelectorAll(DATA_COMPONENT);
+  const triggers = [...document.querySelectorAll(DATA_TRIGGER)]; // convert nodelist to triggers array
+  const parameters = { ...config };
+
+  dialogs.forEach((dialog) => {
+    const { transitionDuration } = dialog.dataset;
+
+    parameters.dialog = dialog;
+    parameters.triggers = triggers.filter(trigger => trigger.dataset.dialogTarget === dialog.id);
+    parameters.labelledby = dialog.dataset.labelledby;
+    parameters.describedby = dialog.dataset.describedby;
+    parameters.modal = dialog.dataset.modal !== 'false';
+    parameters.open = dialog.dataset.open === 'true';
+    parameters.transitionDuration = transitionDuration ? parseInt(transitionDuration, 10) : config.transitionDuration;
+
+    // create the dialog with previous parameters
+    const currentDialog = new Dialog(null, parameters, true);
+    currentDialog.create();
+  });
+}
