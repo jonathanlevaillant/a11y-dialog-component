@@ -93,14 +93,14 @@ export default class Dialog {
   }
 
   [onClick](event) {
-    if (this.config.tooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openTrigger}`)) this.close();
-    if (event.target === this.backdropTrigger) this.close();
+    if (this.config.tooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openTrigger}`)) this.close(event);
+    if (event.target === this.backdropTrigger) this.close(event);
   }
 
   [onKeydown](event) {
     switch (event.which) {
       case KEY_CODES.escape:
-        this.close();
+        this.close(event);
         break;
       case KEY_CODES.tab:
         this[maintainFocus](event);
@@ -162,8 +162,10 @@ export default class Dialog {
     window.setTimeout(() => this.firstFocusableElement.focus(), this.config.transitionDuration);
   }
 
-  [restoreFocus]() {
-    if (this.currentOpenTrigger) window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
+  [restoreFocus](event) {
+    if (this.currentOpenTrigger && (!this.config.tooltip || (this.config.tooltip && event.type !== 'click'))) {
+      window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
+    }
   }
 
   [maintainFocus](event) {
@@ -188,18 +190,18 @@ export default class Dialog {
     this.config.onOpen(this.dialog);
   }
 
-  close() {
+  close(event) {
     this.isOpen = false;
 
     this[setAttributes]();
     this[removeEventListeners]();
-    this[restoreFocus]();
+    this[restoreFocus](event);
 
     this.config.onClose(this.dialog);
   }
 
   toggle(event) {
-    this.isOpen ? this.close() : this.open();
+    this.isOpen ? this.close(event) : this.open();
 
     // save the current open trigger if it exists
     if (event) this.currentOpenTrigger = event.currentTarget;
