@@ -19,6 +19,7 @@ const FOCUSABLE_ELEMENTS = [
 const KEY_CODES = {
   tab: 9,
   escape: 27,
+  f6: 117,
 };
 
 // set private methods with symbols
@@ -102,6 +103,9 @@ export default class Dialog {
       case KEY_CODES.escape:
         this.close(event);
         break;
+      case KEY_CODES.f6:
+        if (!this.config.modal && !this.config.tooltip) this[restoreFocus]();
+        break;
       case KEY_CODES.tab:
         this[maintainFocus](event);
         break;
@@ -162,10 +166,8 @@ export default class Dialog {
     window.setTimeout(() => this.firstFocusableElement.focus(), this.config.transitionDuration);
   }
 
-  [restoreFocus](event) {
-    if (this.currentOpenTrigger && (!this.config.tooltip || (this.config.tooltip && event.type !== 'click'))) {
-      window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
-    }
+  [restoreFocus]() {
+    window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
   }
 
   [maintainFocus](event) {
@@ -195,7 +197,8 @@ export default class Dialog {
 
     this[setAttributes]();
     this[removeEventListeners]();
-    this[restoreFocus](event);
+
+    if (this.currentOpenTrigger && (!this.config.tooltip || (this.config.tooltip && event.type !== 'click'))) this[restoreFocus]();
 
     this.config.onClose(this.dialog);
   }
