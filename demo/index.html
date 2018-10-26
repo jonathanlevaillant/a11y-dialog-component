@@ -9,27 +9,22 @@
   <body>
     <article class="o-container">
       <h2>Dialogs</h2>
-      <button id="trigger-dialog-1" type="button" data-dialog-target="dialog-demo" class="c-btn js-btn"><span>Open Dialog 1</span></button>
-      <button id="trigger-dialog-2" type="button" data-dialog-target="dialog-demo" class="c-btn js-btn">Open Dialog 1</button>
+      <button type="button" class="c-btn js-dialog-open">Open Dialog</button>
+      <button type="button" class="c-btn js-dialog-modeless-open">Open Modeless Dialog</button>
+      <button type="button" class="c-btn js-dialog-tooltip-open">Open Tooltip Dialog</button>
     </article>
-    <div
-      id="dialog-demo"
-      data-component="dialog"
-      data-labelledby="dialog-title-1"
-      data-describedby="dialog-desc-1"
-      data-modal="false"
-      class="c-dialog">
+    <div class="c-dialog js-dialog">
       <div class="c-dialog__inner">
         <header class="u-flex u-flex-main-between">
-          <h2 id="dialog-title-1">Dialog 1</h2>
-          <button type="button" aria-label="Close this window" class="c-btn c-btn--unstyled" data-dialog-close>
+          <h2 id="dialog-title">Dialog</h2>
+          <button type="button" aria-label="Close this window" class="c-btn c-btn--unstyled js-dialog-close">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65.6 65.6" width="24" height="24" class="c-icon__svg u-color-pink" aria-hidden="true" style="width: 1.5em">
               <line x1="4" y1="4" x2="61.6" y2="61.6" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10"></line>
               <line x1="61.6" y1="4" x2="4" y2="61.6" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10"></line>
             </svg>
           </button>
         </header>
-        <p id="dialog-desc-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non.</p>
+        <p id="dialog-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non.</p>
         <form class="u-p">
           <p>
             <label for="dialog-email" class="c-label">Email</label>
@@ -37,13 +32,41 @@
           </p>
           <div class="o-grid o-grid--2 o-grid--1@sm u-p">
             <div class="o-grid__col">
-              <button type="button" class="c-btn u-w100" data-dialog-close>Close</button>
+              <button type="button" class="c-btn u-w100 js-dialog-close">Close</button>
             </div>
             <div class="o-grid__col">
               <button type="button" class="c-btn u-w100">Save</button>
             </div>
           </div>
         </form>
+      </div>
+    </div>
+    <div class="c-dialog c-dialog--modeless js-dialog-modeless">
+      <div class="c-dialog__inner">
+        <header class="u-flex u-flex-main-between">
+          <h2 id="dialog-modeless-title">Modeless Dialog</h2>
+          <button type="button" aria-label="Close this window" class="c-btn c-btn--unstyled js-dialog-modeless-close">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65.6 65.6" width="24" height="24" class="c-icon__svg u-color-pink" aria-hidden="true" style="width: 1.5em">
+              <line x1="4" y1="4" x2="61.6" y2="61.6" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10"></line>
+              <line x1="61.6" y1="4" x2="4" y2="61.6" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10"></line>
+            </svg>
+          </button>
+        </header>
+        <p id="dialog-modeless-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non.</p>
+      </div>
+    </div>
+    <div class="c-dialog c-dialog--modeless js-dialog-tooltip">
+      <div class="c-dialog__inner">
+        <header class="u-flex u-flex-main-between">
+          <h2 id="dialog-tooltip-title">Tooltip Dialog</h2>
+          <button type="button" aria-label="Close this window" class="c-btn c-btn--unstyled js-dialog-tooltip-close">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65.6 65.6" width="24" height="24" class="c-icon__svg u-color-pink" aria-hidden="true" style="width: 1.5em">
+              <line x1="4" y1="4" x2="61.6" y2="61.6" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10"></line>
+              <line x1="61.6" y1="4" x2="4" y2="61.6" stroke-width="8" stroke-linecap="round" stroke-miterlimit="10"></line>
+            </svg>
+          </button>
+        </header>
+        <p id="dialog-tooltip-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum mollis velit non.</p>
       </div>
     </div>
     <script src="./dist/main.js"></script>

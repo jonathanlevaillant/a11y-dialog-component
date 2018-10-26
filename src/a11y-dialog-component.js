@@ -1,10 +1,6 @@
 /* dialogs
  ========================================================================== */
 
-const DATA_COMPONENT = '[data-component="dialog"]';
-const DATA_TRIGGER = '[data-dialog-target]';
-const DATA_CLOSE = '[data-dialog-close]';
-
 const DEFAULT_CONFIG = {
   transitionDuration: 200,
 };
@@ -49,33 +45,46 @@ export function setDialogs({
 
 // core dialog class
 export default class Dialog {
-  constructor(dialogSelector, {
-    dialog = document.querySelector(dialogSelector),
+  constructor(dialog, {
     onOpen = () => {},
     onClose = () => {},
-    triggers = [],
+    openTrigger,
+    closeTrigger,
+    backdropTrigger,
     labelledby,
     describedby,
     modal = true,
-    backdrop = true,
+    tooltip = false,
     open = false,
     transitionDuration = config.transitionDuration,
-  } = {}, dataComponent = false) {
-    this.dialog = dialog;
-    this.onOpen = onOpen;
-    this.onClose = onClose;
-    this.triggers = !dataComponent ? triggers.map(trigger => document.querySelector(trigger)) : triggers;
-    this.currentTrigger = null;
-    this.closeTriggers = this.dialog.querySelectorAll(DATA_CLOSE);
-    this.labelledby = labelledby;
-    this.describedby = describedby;
-    this.modal = modal;
-    this.backdrop = backdrop;
-    this.isOpen = open;
-    this.transitionDuration = transitionDuration;
+  } = {}) {
+    // save the initial configuration
+    this.config = {
+      dialog,
+      onOpen,
+      onClose,
+      openTrigger,
+      closeTrigger,
+      backdropTrigger,
+      labelledby,
+      describedby,
+      modal,
+      tooltip,
+      open,
+      transitionDuration,
+    };
+
+    this.dialog = document.querySelector(dialog);
+    this.openTriggers = document.querySelectorAll(openTrigger);
+    this.closeTriggers = this.dialog.querySelectorAll(closeTrigger);
+    this.backdropTrigger = document.querySelector(backdropTrigger);
+
     this.focusableElements = [];
     this.firstFocusableElement = null;
     this.lastFocusableElement = null;
+    this.currentOpenTrigger = null;
+
+    this.isOpen = open;
 
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -84,7 +93,8 @@ export default class Dialog {
   }
 
   [onClick](event) {
-    if (this.backdrop && event.target === this.dialog) this.close();
+    if (this.config.tooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openTrigger}`)) this.close();
+    if (event.target === this.backdropTrigger) this.close();
   }
 
   [onKeydown](event) {
@@ -101,13 +111,13 @@ export default class Dialog {
   }
 
   [addEventListeners]() {
-    this.dialog.addEventListener('click', this[onClick]);
+    document.addEventListener('click', this[onClick]);
     this.dialog.addEventListener('keydown', this[onKeydown]);
     this.closeTriggers.forEach(closeTrigger => closeTrigger.addEventListener('click', this.close));
   }
 
   [removeEventListeners]() {
-    this.dialog.removeEventListener('click', this[onClick]);
+    document.removeEventListener('click', this[onClick]);
     this.dialog.removeEventListener('keydown', this[onKeydown]);
     this.closeTriggers.forEach(closeTrigger => closeTrigger.removeEventListener('click', this.close));
   }
@@ -117,12 +127,12 @@ export default class Dialog {
     this.dialog.setAttribute('tabindex', -1);
     this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
-    if (this.labelledby) this.dialog.setAttribute('aria-labelledby', this.labelledby);
-    if (this.describedby) this.dialog.setAttribute('aria-describedby', this.describedby);
+    if (this.config.labelledby) this.dialog.setAttribute('aria-labelledby', this.config.labelledby);
+    if (this.config.describedby) this.dialog.setAttribute('aria-describedby', this.config.describedby);
 
-    if (this.modal) this.dialog.setAttribute('aria-modal', true);
+    if (this.config.modal) this.dialog.setAttribute('aria-modal', true);
 
-    this.triggers.forEach(trigger => trigger.setAttribute('aria-haspopup', 'dialog'));
+    this.openTriggers.forEach(openTrigger => openTrigger.setAttribute('aria-haspopup', 'dialog'));
   }
 
   [removeAttributes]() {
@@ -133,7 +143,7 @@ export default class Dialog {
     this.dialog.removeAttribute('aria-describedby');
     this.dialog.removeAttribute('aria-modal');
 
-    this.triggers.forEach(trigger => trigger.removeAttribute('aria-haspopup'));
+    this.openTriggers.forEach(openTrigger => openTrigger.removeAttribute('aria-haspopup'));
   }
 
   [setAttributes]() {
@@ -149,11 +159,11 @@ export default class Dialog {
   }
 
   [setFocus]() {
-    window.setTimeout(() => this.firstFocusableElement.focus(), this.transitionDuration);
+    window.setTimeout(() => this.firstFocusableElement.focus(), this.config.transitionDuration);
   }
 
   [restoreFocus]() {
-    if (this.currentTrigger) window.setTimeout(() => this.currentTrigger.focus(), this.transitionDuration);
+    if (this.currentOpenTrigger) window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
   }
 
   [maintainFocus](event) {
@@ -175,7 +185,7 @@ export default class Dialog {
     this[addEventListeners]();
     this[setFocus]();
 
-    this.onOpen(this.dialog);
+    this.config.onOpen(this.dialog);
   }
 
   close() {
@@ -185,14 +195,14 @@ export default class Dialog {
     this[removeEventListeners]();
     this[restoreFocus]();
 
-    this.onClose(this.dialog);
+    this.config.onClose(this.dialog);
   }
 
   toggle(event) {
     this.isOpen ? this.close() : this.open();
 
-    // save the current trigger if it exists
-    if (event) this.currentTrigger = event.currentTarget;
+    // save the current open trigger if it exists
+    if (event) this.currentOpenTrigger = event.currentTarget;
   }
 
   create() {
@@ -202,39 +212,15 @@ export default class Dialog {
     // if "isOpen" parameter is set to true when the dialog is created, then, open it
     if (this.isOpen) this.open();
 
-    // add event listener to each trigger linked to dialog
-    this.triggers.forEach(trigger => trigger.addEventListener('click', this.toggle));
+    // add event listener to each open trigger linked to dialog
+    this.openTriggers.forEach(openTrigger => openTrigger.addEventListener('click', this.toggle));
   }
 
   destroy() {
     this[removeAttributes]();
     this[removeEventListeners]();
 
-    // remove event listener to each trigger linked to dialog
-    this.triggers.forEach(trigger => trigger.removeEventListener('click', this.toggle));
+    // remove event listener to each open trigger linked to dialog
+    this.openTriggers.forEach(openTrigger => openTrigger.removeEventListener('click', this.toggle));
   }
-}
-
-// add dialogs based on data components
-export function addDialogs() {
-  const dialogs = document.querySelectorAll(DATA_COMPONENT);
-  const triggers = [...document.querySelectorAll(DATA_TRIGGER)]; // convert nodelist to triggers array
-  const parameters = { ...config };
-
-  dialogs.forEach((dialog) => {
-    const { transitionDuration } = dialog.dataset;
-
-    parameters.dialog = dialog;
-    parameters.triggers = triggers.filter(trigger => trigger.dataset.dialogTarget === dialog.id);
-    parameters.labelledby = dialog.dataset.labelledby;
-    parameters.describedby = dialog.dataset.describedby;
-    parameters.modal = dialog.dataset.modal !== 'false';
-    parameters.backdrop = dialog.dataset.backdrop !== 'false';
-    parameters.open = dialog.dataset.open === 'true';
-    parameters.transitionDuration = transitionDuration ? parseInt(transitionDuration, 10) : config.transitionDuration;
-
-    // create the dialog with previous parameters
-    const currentDialog = new Dialog(null, parameters, true);
-    currentDialog.create();
-  });
 }
