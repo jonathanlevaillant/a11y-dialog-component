@@ -3,6 +3,7 @@
 
 const DEFAULT_CONFIG = {
   transitionDuration: 200,
+  activeOpenTriggerClass: 'is-active',
 };
 
 const FOCUSABLE_ELEMENTS = [
@@ -41,8 +42,9 @@ let config = DEFAULT_CONFIG;
 
 export function setDialogs({
   transitionDuration = config.transitionDuration,
+  activeOpenTriggerClass = config.activeOpenTriggerClass,
 } = {}) {
-  config = { ...DEFAULT_CONFIG, ...{ transitionDuration } };
+  config = { ...DEFAULT_CONFIG, ...{ transitionDuration, activeOpenTriggerClass } };
 }
 
 // core dialog class
@@ -59,6 +61,7 @@ export default class Dialog {
     tooltip = false,
     open = false,
     transitionDuration = config.transitionDuration,
+    activeOpenTriggerClass = config.activeOpenTriggerClass,
   } = {}) {
     // save the initial configuration
     this.config = {
@@ -74,6 +77,7 @@ export default class Dialog {
       tooltip,
       open,
       transitionDuration,
+      activeOpenTriggerClass,
     };
 
     this.dialog = document.querySelector(dialog);
@@ -156,6 +160,10 @@ export default class Dialog {
 
   [setAttributes]() {
     this.dialog.setAttribute('aria-hidden', !this.isOpen);
+
+    if (this.currentOpenTrigger) {
+      this.isOpen ? this.currentOpenTrigger.classList.add(this.config.activeOpenTriggerClass) : this.currentOpenTrigger.classList.remove(this.config.activeOpenTriggerClass);
+    }
   }
 
   [setFocusableElements]() {
@@ -219,10 +227,10 @@ export default class Dialog {
   }
 
   toggle(event) {
-    this.isOpen ? this.close(event) : this.open();
-
     // save the current open trigger if it exists
     if (event) this.currentOpenTrigger = event.currentTarget;
+
+    this.isOpen ? this.close(event) : this.open();
   }
 
   create() {
