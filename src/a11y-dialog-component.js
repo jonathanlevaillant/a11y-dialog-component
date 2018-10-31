@@ -32,6 +32,7 @@ const removeAttributes = Symbol('removeAttributes');
 const setAttributes = Symbol('setAttributes');
 const setFocusableElements = Symbol('setFocusableElements');
 const setFocus = Symbol('setFocus');
+const switchFocus = Symbol('switchFocus');
 const restoreFocus = Symbol('restoreFocus');
 const maintainFocus = Symbol('maintainFocus');
 
@@ -91,6 +92,7 @@ export default class Dialog {
     this.toggle = this.toggle.bind(this);
     this[onClick] = this[onClick].bind(this);
     this[onKeydown] = this[onKeydown].bind(this);
+    this[switchFocus] = this[switchFocus].bind(this);
   }
 
   [onClick](event) {
@@ -124,6 +126,8 @@ export default class Dialog {
     document.removeEventListener('click', this[onClick]);
     this.dialog.removeEventListener('keydown', this[onKeydown]);
     this.closeTriggers.forEach(closeTrigger => closeTrigger.removeEventListener('click', this.close));
+
+    if (this.currentOpenTrigger) this.currentOpenTrigger.removeEventListener('keydown', this[switchFocus]);
   }
 
   [addAttributes]() {
@@ -166,8 +170,18 @@ export default class Dialog {
     window.setTimeout(() => this.firstFocusableElement.focus(), this.config.transitionDuration);
   }
 
+  [switchFocus](event) {
+    if (event.which === KEY_CODES.f6) {
+      this.currentOpenTrigger.removeEventListener('keydown', this[switchFocus]);
+      this[setFocus]();
+    }
+  }
+
   [restoreFocus]() {
     window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
+
+    // switch focus between the application and the open non-modal dialog
+    if (this.isOpen) this.currentOpenTrigger.addEventListener('keydown', this[switchFocus]);
   }
 
   [maintainFocus](event) {
@@ -198,6 +212,7 @@ export default class Dialog {
     this[setAttributes]();
     this[removeEventListeners]();
 
+    // restore focus except for tooltip click events
     if (this.currentOpenTrigger && (!this.config.tooltip || (this.config.tooltip && event.type !== 'click'))) this[restoreFocus]();
 
     this.config.onClose(this.dialog);
