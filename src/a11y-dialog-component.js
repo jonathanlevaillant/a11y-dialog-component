@@ -1,12 +1,14 @@
 /* dialogs
  ========================================================================== */
 
-const DEFAULT_CONFIG = {
+// save the global default configuration
+const defaultConfig = {
   transitionDuration: 200,
-  activeOpenTriggerClass: 'is-active',
+  triggerActiveClass: 'is-active',
 };
 
-const FOCUSABLE_ELEMENTS = [
+// save all keyboard focusable elements
+const focusableElements = [
   '[href]:not([tabindex^="-"])',
   'input:not([disabled]):not([type="hidden"]):not([tabindex^="-"]):not([type="radio"])',
   'input[type="radio"]:checked',
@@ -17,13 +19,14 @@ const FOCUSABLE_ELEMENTS = [
   '[contenteditable="true"]:not([tabindex^="-"])',
 ];
 
-const KEY_CODES = {
-  tab: 9,
-  escape: 27,
-  f6: 117,
+// save all keyboard codes
+const keyCodes = {
+  escape: 'Escape',
+  tab: 'Tab',
+  f6: 'F6',
 };
 
-// set private methods with symbols
+// create private methods with symbols
 const onClick = Symbol('onClick');
 const onKeydown = Symbol('onKeydown');
 const addEventListeners = Symbol('addEventListeners');
@@ -33,64 +36,64 @@ const removeAttributes = Symbol('removeAttributes');
 const setAttributes = Symbol('setAttributes');
 const setFocusableElements = Symbol('setFocusableElements');
 const setFocus = Symbol('setFocus');
-const switchFocus = Symbol('switchFocus');
 const restoreFocus = Symbol('restoreFocus');
+const switchFocus = Symbol('switchFocus');
 const maintainFocus = Symbol('maintainFocus');
 
-// set the custom configuration
-let config = DEFAULT_CONFIG;
+let customConfig = defaultConfig;
 
+// update the global default configuration if needed
 export function setDialogs({
-  transitionDuration = config.transitionDuration,
-  activeOpenTriggerClass = config.activeOpenTriggerClass,
+  transitionDuration = customConfig.transitionDuration,
+  triggerActiveClass = customConfig.triggerActiveClass,
 } = {}) {
-  config = { ...DEFAULT_CONFIG, ...{ transitionDuration, activeOpenTriggerClass } };
+  customConfig = { ...defaultConfig, ...{ transitionDuration, triggerActiveClass } };
 }
 
-// core dialog class
+// export the core dialog class
 export default class Dialog {
   constructor(dialog, {
     onOpen = () => {},
     onClose = () => {},
-    openTrigger,
-    closeTrigger,
-    backdropTrigger,
+    openingTrigger,
+    closingTrigger,
+    backdropElement,
     labelledby,
     describedby,
-    modal = true,
-    tooltip = false,
-    open = false,
-    transitionDuration = config.transitionDuration,
-    activeOpenTriggerClass = config.activeOpenTriggerClass,
+    isModal = true,
+    isTooltip = false,
+    isOpen = false,
+    transitionDuration = customConfig.transitionDuration,
+    triggerActiveClass = customConfig.triggerActiveClass,
   } = {}) {
     // save the initial configuration
     this.config = {
       dialog,
       onOpen,
       onClose,
-      openTrigger,
-      closeTrigger,
-      backdropTrigger,
+      openingTrigger,
+      closingTrigger,
+      backdropElement,
       labelledby,
       describedby,
-      modal,
-      tooltip,
-      open,
+      isModal,
+      isTooltip,
+      isOpen,
       transitionDuration,
-      activeOpenTriggerClass,
+      triggerActiveClass,
     };
 
     this.dialog = document.querySelector(dialog);
-    this.openTriggers = document.querySelectorAll(openTrigger);
-    this.closeTriggers = this.dialog.querySelectorAll(closeTrigger);
-    this.backdropTrigger = document.querySelector(backdropTrigger);
+    this.openingTriggers = document.querySelectorAll(openingTrigger);
+    this.closingTriggers = this.dialog.querySelectorAll(closingTrigger);
+    this.backdropElement = document.querySelector(backdropElement);
 
     this.focusableElements = [];
     this.firstFocusableElement = null;
     this.lastFocusableElement = null;
-    this.currentOpenTrigger = null;
+    this.currentOpeningTrigger = null;
 
-    this.isOpen = open;
+    this.isOpen = isOpen;
 
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -100,19 +103,19 @@ export default class Dialog {
   }
 
   [onClick](event) {
-    if (this.config.tooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openTrigger}`)) this.close(event);
-    if (event.target === this.backdropTrigger) this.close(event);
+    if (this.config.isTooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openingTrigger}`)) this.close(event);
+    if (event.target === this.backdropElement) this.close(event);
   }
 
   [onKeydown](event) {
-    switch (event.which) {
-      case KEY_CODES.escape:
+    switch (event.key) {
+      case keyCodes.escape:
         this.close(event);
         break;
-      case KEY_CODES.f6:
-        if (!this.config.modal && !this.config.tooltip) this[restoreFocus]();
+      case keyCodes.f6:
+        if (!this.config.isModal && !this.config.isTooltip) this[restoreFocus]();
         break;
-      case KEY_CODES.tab:
+      case keyCodes.tab:
         this[maintainFocus](event);
         break;
       default:
@@ -123,15 +126,15 @@ export default class Dialog {
   [addEventListeners]() {
     document.addEventListener('click', this[onClick]);
     this.dialog.addEventListener('keydown', this[onKeydown]);
-    this.closeTriggers.forEach(closeTrigger => closeTrigger.addEventListener('click', this.close));
+    this.closingTriggers.forEach(closingTrigger => closingTrigger.addEventListener('click', this.close));
   }
 
   [removeEventListeners]() {
     document.removeEventListener('click', this[onClick]);
     this.dialog.removeEventListener('keydown', this[onKeydown]);
-    this.closeTriggers.forEach(closeTrigger => closeTrigger.removeEventListener('click', this.close));
+    this.closingTriggers.forEach(closingTrigger => closingTrigger.removeEventListener('click', this.close));
 
-    if (this.currentOpenTrigger) this.currentOpenTrigger.removeEventListener('keydown', this[switchFocus]);
+    if (this.currentOpeningTrigger) this.currentOpeningTrigger.removeEventListener('keydown', this[switchFocus]);
   }
 
   [addAttributes]() {
@@ -142,9 +145,9 @@ export default class Dialog {
     if (this.config.labelledby) this.dialog.setAttribute('aria-labelledby', this.config.labelledby);
     if (this.config.describedby) this.dialog.setAttribute('aria-describedby', this.config.describedby);
 
-    if (this.config.modal) this.dialog.setAttribute('aria-modal', true);
+    if (this.config.isModal) this.dialog.setAttribute('aria-modal', true);
 
-    this.openTriggers.forEach(openTrigger => openTrigger.setAttribute('aria-haspopup', 'dialog'));
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.setAttribute('aria-haspopup', 'dialog'));
   }
 
   [removeAttributes]() {
@@ -155,21 +158,25 @@ export default class Dialog {
     this.dialog.removeAttribute('aria-describedby');
     this.dialog.removeAttribute('aria-modal');
 
-    this.openTriggers.forEach(openTrigger => openTrigger.removeAttribute('aria-haspopup'));
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
   }
 
   [setAttributes]() {
     this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
-    if (this.currentOpenTrigger) {
-      this.isOpen ? this.currentOpenTrigger.classList.add(this.config.activeOpenTriggerClass) : this.currentOpenTrigger.classList.remove(this.config.activeOpenTriggerClass);
+    if (this.currentOpeningTrigger) {
+      if (this.isOpen) {
+        this.currentOpeningTrigger.classList.add(this.config.triggerActiveClass);
+      } else {
+        this.currentOpeningTrigger.classList.remove(this.config.triggerActiveClass);
+      }
     }
   }
 
   [setFocusableElements]() {
-    const focusableElements = this.dialog.querySelectorAll(FOCUSABLE_ELEMENTS);
+    const focusableElems = this.dialog.querySelectorAll(focusableElements);
 
-    this.focusableElements = focusableElements.length > 0 ? focusableElements : [this.dialog];
+    this.focusableElements = focusableElems.length > 0 ? focusableElems : [this.dialog];
     [this.firstFocusableElement] = this.focusableElements;
     this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
   }
@@ -178,18 +185,18 @@ export default class Dialog {
     window.setTimeout(() => this.firstFocusableElement.focus(), this.config.transitionDuration);
   }
 
-  [switchFocus](event) {
-    if (event.which === KEY_CODES.f6) {
-      this.currentOpenTrigger.removeEventListener('keydown', this[switchFocus]);
-      this[setFocus]();
-    }
+  [restoreFocus]() {
+    window.setTimeout(() => this.currentOpeningTrigger.focus(), this.config.transitionDuration);
+
+    // switch focus between the current opening trigger and the non-modal dialog
+    if (this.isOpen) this.currentOpeningTrigger.addEventListener('keydown', this[switchFocus]);
   }
 
-  [restoreFocus]() {
-    window.setTimeout(() => this.currentOpenTrigger.focus(), this.config.transitionDuration);
-
-    // switch focus between the application and the open non-modal dialog
-    if (this.isOpen) this.currentOpenTrigger.addEventListener('keydown', this[switchFocus]);
+  [switchFocus](event) {
+    if (event.key === keyCodes.f6) {
+      this.currentOpeningTrigger.removeEventListener('keydown', this[switchFocus]);
+      this[setFocus]();
+    }
   }
 
   [maintainFocus](event) {
@@ -221,14 +228,14 @@ export default class Dialog {
     this[removeEventListeners]();
 
     // restore focus except for tooltip click events
-    if (this.currentOpenTrigger && (!this.config.tooltip || (this.config.tooltip && event.type !== 'click'))) this[restoreFocus]();
+    if (this.currentOpeningTrigger && (!this.config.isTooltip || (this.config.isTooltip && event.type !== 'click'))) this[restoreFocus]();
 
     this.config.onClose(this.dialog);
   }
 
   toggle(event) {
-    // save the current open trigger if it exists
-    if (event) this.currentOpenTrigger = event.currentTarget;
+    // save the current opening trigger if it exists
+    if (event) this.currentOpeningTrigger = event.currentTarget;
 
     this.isOpen ? this.close(event) : this.open();
   }
@@ -240,15 +247,15 @@ export default class Dialog {
     // if "isOpen" parameter is set to true when the dialog is created, then, open it
     if (this.isOpen) this.open();
 
-    // add event listener to each open trigger linked to dialog
-    this.openTriggers.forEach(openTrigger => openTrigger.addEventListener('click', this.toggle));
+    // add event listener to each opening trigger linked to dialog
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
   }
 
   destroy() {
     this[removeAttributes]();
     this[removeEventListeners]();
 
-    // remove event listener to each open trigger linked to dialog
-    this.openTriggers.forEach(openTrigger => openTrigger.removeEventListener('click', this.toggle));
+    // remove event listener to each opening trigger linked to dialog
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.removeEventListener('click', this.toggle));
   }
 }
