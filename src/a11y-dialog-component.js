@@ -110,6 +110,7 @@ export default class Dialog {
   [onKeydown](event) {
     switch (event.key) {
       case keyCodes.escape:
+        event.stopPropagation();
         this.close(event);
         break;
       case keyCodes.f6:
