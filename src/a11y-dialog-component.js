@@ -113,7 +113,7 @@ export default class Dialog {
         this.close(event);
         break;
       case keyCodes.f6:
-        if (!this.config.isModal && !this.config.isTooltip) this[restoreFocus]();
+        if (!this.config.isModal) !this.config.isTooltip ? this[restoreFocus]() : this.close(event);
         break;
       case keyCodes.tab:
         this[maintainFocus](event);
