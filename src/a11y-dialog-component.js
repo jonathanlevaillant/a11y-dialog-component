@@ -159,18 +159,14 @@ export default class Dialog {
     this.dialog.removeAttribute('aria-modal');
 
     this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
+
+    if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.remove(this.config.triggerActiveClass);
   }
 
   [setAttributes]() {
     this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
-    if (this.currentOpeningTrigger) {
-      if (this.isOpen) {
-        this.currentOpeningTrigger.classList.add(this.config.triggerActiveClass);
-      } else {
-        this.currentOpeningTrigger.classList.remove(this.config.triggerActiveClass);
-      }
-    }
+    if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.toggle(this.config.triggerActiveClass);
   }
 
   [setFocusableElements]() {
