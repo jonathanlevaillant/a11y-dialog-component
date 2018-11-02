@@ -138,6 +138,7 @@ export default class Dialog {
     this[onKeydown] = this[onKeydown].bind(this);
     this[switchFocus] = this[switchFocus].bind(this);
 
+    // add mutation observer to update focusable elements when a nested dialog is created
     this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
   }
 
