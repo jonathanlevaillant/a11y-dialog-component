@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     labelledby: 'dialog-modeless-title',
     describedby: 'dialog-modeless-desc',
     isModal: false,
+    disableScroll: false,
   });
 
   const dialogTooltip = new Dialog('.js-dialog-tooltip', {
@@ -23,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     labelledby: 'dialog-tooltip-title',
     isModal: false,
     isTooltip: true,
+    disableScroll: false,
   });
 
   dialog.create();

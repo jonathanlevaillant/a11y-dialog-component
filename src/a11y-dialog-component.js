@@ -3,8 +3,10 @@
 
 // save the global default configuration
 const defaultConfig = {
-  transitionDuration: 200,
+  documentClass: 'js-document',
+  documentDisabledClass: 'is-disabled',
   triggerActiveClass: 'is-active',
+  transitionDuration: 200,
 };
 
 // save all keyboard focusable elements
@@ -81,10 +83,20 @@ let customConfig = defaultConfig;
 
 // update the global default configuration if needed
 export function setDialogs({
-  transitionDuration = customConfig.transitionDuration,
+  documentClass = customConfig.documentClass,
+  documentDisabledClass = customConfig.documentDisabledClass,
   triggerActiveClass = customConfig.triggerActiveClass,
+  transitionDuration = customConfig.transitionDuration,
 } = {}) {
-  customConfig = { ...defaultConfig, ...{ transitionDuration, triggerActiveClass } };
+  customConfig = {
+    ...defaultConfig,
+    ...{
+      documentClass,
+      documentDisabledClass,
+      triggerActiveClass,
+      transitionDuration,
+    },
+  };
 }
 
 // export the core dialog class
@@ -100,8 +112,9 @@ export default class Dialog {
     isModal = true,
     isTooltip = false,
     isOpen = false,
-    transitionDuration = customConfig.transitionDuration,
+    disableScroll = true,
     triggerActiveClass = customConfig.triggerActiveClass,
+    transitionDuration = customConfig.transitionDuration,
   } = {}) {
     // save the initial configuration
     this.config = {
@@ -116,14 +129,19 @@ export default class Dialog {
       isModal,
       isTooltip,
       isOpen,
-      transitionDuration,
+      disableScroll,
+      documentClass: customConfig.documentClass,
+      documentDisabledClass: customConfig.documentDisabledClass,
       triggerActiveClass,
+      transitionDuration,
     };
 
     this.dialog = document.querySelector(dialog);
     this.openingTriggers = document.querySelectorAll(openingTrigger);
     this.closingTriggers = this.dialog.querySelectorAll(closingTrigger);
     this.backdropElement = document.querySelector(backdropElement);
+    this.document = document.getElementsByClassName(this.config.documentClass)[0] || document.querySelector('html');
+    this.documentIsAlreadyDisabled = false;
 
     this.focusableElements = [];
     this.firstFocusableElement = null;
@@ -143,7 +161,9 @@ export default class Dialog {
   }
 
   [onClick](event) {
-    if (this.config.isTooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openingTrigger}`)) this.close(event);
+    if (this.config.isTooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openingTrigger}`)) {
+      this.close(event);
+    }
     if (event.target === this.backdropElement) this.close(event);
   }
 
@@ -199,6 +219,10 @@ export default class Dialog {
     this.dialog.removeAttribute('aria-describedby');
     this.dialog.removeAttribute('aria-modal');
 
+    if (this.config.disableScroll && this.isOpen && !this.documentIsAlreadyDisabled) {
+      this.document.classList.remove(this.config.documentDisabledClass);
+    }
+
     this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
 
     if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.remove(this.config.triggerActiveClass);
@@ -207,13 +231,18 @@ export default class Dialog {
   [setAttributes]() {
     this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
+    if (this.config.disableScroll && !this.documentIsAlreadyDisabled) {
+      this.document.classList.toggle(this.config.documentDisabledClass);
+    }
+
     if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.toggle(this.config.triggerActiveClass);
   }
 
   [setFocusableElements]() {
-    const focusableElems = getNoNestedSelectors(this.dialog, getVisibleSelectors(this.dialog.querySelectorAll(focusableElements)));
+    const visibleFocusableElements = getVisibleSelectors(this.dialog.querySelectorAll(focusableElements));
+    const filteredFocusableElements = getNoNestedSelectors(this.dialog, visibleFocusableElements);
 
-    this.focusableElements = focusableElems.length > 0 ? focusableElems : [this.dialog];
+    this.focusableElements = filteredFocusableElements.length > 0 ? filteredFocusableElements : [this.dialog];
     [this.firstFocusableElement] = this.focusableElements;
     this.lastFocusableElement = this.focusableElements[this.focusableElements.length - 1];
   }
@@ -258,6 +287,7 @@ export default class Dialog {
 
   open() {
     this.isOpen = true;
+    this.documentIsAlreadyDisabled = this.document.classList.contains(this.config.documentDisabledClass);
 
     this[setAttributes]();
     this[addEventListeners]();
@@ -273,7 +303,9 @@ export default class Dialog {
     this[removeEventListeners]();
 
     // restore focus except for tooltip click events
-    if (this.currentOpeningTrigger && (!this.config.isTooltip || (this.config.isTooltip && event.type !== 'click'))) this[restoreFocus]();
+    if (this.currentOpeningTrigger && (!this.config.isTooltip || (this.config.isTooltip && event.type !== 'click'))) {
+      this[restoreFocus]();
+    }
 
     this.config.onClose(this.dialog);
   }
