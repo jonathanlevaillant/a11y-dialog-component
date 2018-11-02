@@ -28,39 +28,39 @@ const keyCodes = {
   f6: 'F6',
 };
 
-// only get visible selectors
-const getVisibleSelectors = (selectors) => {
-  const visibleSelectors = [];
+// only get visible elements
+const getVisibleElements = (elements) => {
+  const visibleElements = [];
 
-  selectors.forEach((selector) => {
-    const bounding = selector.getBoundingClientRect();
+  elements.forEach((element) => {
+    const bounding = element.getBoundingClientRect();
     const isVisible = bounding.width > 0 || bounding.height > 0;
 
-    if (isVisible) visibleSelectors.push(selector);
+    if (isVisible) visibleElements.push(element);
   });
 
-  return visibleSelectors;
+  return visibleElements;
 };
 
-// only get no nested selectors
-const getNoNestedSelectors = (dialog, selectors) => {
-  const nestedDialogs = dialog.querySelectorAll('[role="dialog"]');
-  const noNestedSelectors = [];
+// only get no nested elements
+const getNoNestedElements = (context, selector, elements) => {
+  const nestedComponents = context.querySelectorAll(selector);
+  const noNestedElements = [];
   let isNested = false;
 
-  if (nestedDialogs.length === 0) return selectors;
+  if (nestedComponents.length === 0) return elements;
 
-  selectors.forEach((selector) => {
-    nestedDialogs.forEach((nestedDialog) => {
-      if (nestedDialog.contains(selector)) isNested = true;
+  elements.forEach((element) => {
+    nestedComponents.forEach((nestedComponent) => {
+      if (nestedComponent.contains(element)) isNested = true;
     });
 
-    if (!isNested) noNestedSelectors.push(selector);
+    if (!isNested) noNestedElements.push(element);
 
     isNested = false;
   });
 
-  return noNestedSelectors;
+  return noNestedElements;
 };
 
 // create private methods with symbols
@@ -101,12 +101,12 @@ export function setDialogs({
 
 // export the core dialog class
 export default class Dialog {
-  constructor(dialog, {
+  constructor(dialogSelector, {
     onOpen = () => {},
     onClose = () => {},
-    openingTrigger,
-    closingTrigger,
-    backdropElement,
+    openingSelector,
+    closingSelector,
+    backdropSelector,
     labelledby,
     describedby,
     isModal = true,
@@ -118,12 +118,12 @@ export default class Dialog {
   } = {}) {
     // save the initial configuration
     this.config = {
-      dialog,
+      dialogSelector,
       onOpen,
       onClose,
-      openingTrigger,
-      closingTrigger,
-      backdropElement,
+      openingSelector,
+      closingSelector,
+      backdropSelector,
       labelledby,
       describedby,
       isModal,
@@ -136,10 +136,11 @@ export default class Dialog {
       transitionDuration,
     };
 
-    this.dialog = document.querySelector(dialog);
-    this.openingTriggers = document.querySelectorAll(openingTrigger);
-    this.closingTriggers = this.dialog.querySelectorAll(closingTrigger);
-    this.backdropElement = document.querySelector(backdropElement);
+    this.dialog = document.querySelector(dialogSelector);
+    this.dialogArea = `${dialogSelector}, ${openingSelector}`;
+    this.openingTriggers = document.querySelectorAll(openingSelector);
+    this.closingTriggers = this.dialog.querySelectorAll(closingSelector);
+    this.backdropTrigger = document.querySelector(backdropSelector);
     this.document = document.getElementsByClassName(this.config.documentClass)[0] || document.querySelector('html');
     this.documentIsAlreadyDisabled = false;
 
@@ -161,10 +162,10 @@ export default class Dialog {
   }
 
   [onClick](event) {
-    if (this.config.isTooltip && !event.target.closest(`${this.config.dialog}, ${this.config.openingTrigger}`)) {
+    if (this.config.isTooltip && !event.target.closest(this.dialogArea)) {
       this.close(event);
     }
-    if (event.target === this.backdropElement) this.close(event);
+    if (event.target === this.backdropTrigger) this.close(event);
   }
 
   [onKeydown](event) {
@@ -239,8 +240,8 @@ export default class Dialog {
   }
 
   [setFocusableElements]() {
-    const visibleFocusableElements = getVisibleSelectors(this.dialog.querySelectorAll(focusableElements));
-    const filteredFocusableElements = getNoNestedSelectors(this.dialog, visibleFocusableElements);
+    const visibleFocusableElements = getVisibleElements(this.dialog.querySelectorAll(focusableElements));
+    const filteredFocusableElements = getNoNestedElements(this.dialog, '[role="dialog"]', visibleFocusableElements);
 
     this.focusableElements = filteredFocusableElements.length > 0 ? filteredFocusableElements : [this.dialog];
     [this.firstFocusableElement] = this.focusableElements;
