@@ -165,13 +165,13 @@ export default class Dialog {
   }
 
   [addEventListeners]() {
-    document.addEventListener('click', this[onClick]);
+    document.addEventListener('click', this[onClick], { capture: true });
     this.dialog.addEventListener('keydown', this[onKeydown]);
     this.closingTriggers.forEach(closingTrigger => closingTrigger.addEventListener('click', this.close));
   }
 
   [removeEventListeners]() {
-    document.removeEventListener('click', this[onClick]);
+    document.removeEventListener('click', this[onClick], { capture: true });
     this.dialog.removeEventListener('keydown', this[onKeydown]);
     this.closingTriggers.forEach(closingTrigger => closingTrigger.removeEventListener('click', this.close));
 
