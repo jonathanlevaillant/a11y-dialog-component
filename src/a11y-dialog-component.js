@@ -26,6 +26,41 @@ const keyCodes = {
   f6: 'F6',
 };
 
+// only get visible selectors
+const getVisibleSelectors = (selectors) => {
+  const visibleSelectors = [];
+
+  selectors.forEach((selector) => {
+    const bounding = selector.getBoundingClientRect();
+    const isVisible = bounding.width > 0 || bounding.height > 0;
+
+    if (isVisible) visibleSelectors.push(selector);
+  });
+
+  return visibleSelectors;
+};
+
+// only get no nested selectors
+const getNoNestedSelectors = (dialog, selectors) => {
+  const nestedDialogs = dialog.querySelectorAll('[role="dialog"]');
+  const noNestedSelectors = [];
+  let isNested = false;
+
+  if (nestedDialogs.length === 0) return selectors;
+
+  selectors.forEach((selector) => {
+    nestedDialogs.forEach((nestedDialog) => {
+      if (nestedDialog.contains(selector)) isNested = true;
+    });
+
+    if (!isNested) noNestedSelectors.push(selector);
+
+    isNested = false;
+  });
+
+  return noNestedSelectors;
+};
+
 // create private methods with symbols
 const onClick = Symbol('onClick');
 const onKeydown = Symbol('onKeydown');
@@ -39,6 +74,8 @@ const setFocus = Symbol('setFocus');
 const restoreFocus = Symbol('restoreFocus');
 const switchFocus = Symbol('switchFocus');
 const maintainFocus = Symbol('maintainFocus');
+const addObserver = Symbol('addObserver');
+const removeObserver = Symbol('removeObserver');
 
 let customConfig = defaultConfig;
 
@@ -100,6 +137,8 @@ export default class Dialog {
     this[onClick] = this[onClick].bind(this);
     this[onKeydown] = this[onKeydown].bind(this);
     this[switchFocus] = this[switchFocus].bind(this);
+
+    this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
   }
 
   [onClick](event) {
@@ -171,7 +210,7 @@ export default class Dialog {
   }
 
   [setFocusableElements]() {
-    const focusableElems = this.dialog.querySelectorAll(focusableElements);
+    const focusableElems = getNoNestedSelectors(this.dialog, getVisibleSelectors(this.dialog.querySelectorAll(focusableElements)));
 
     this.focusableElements = focusableElems.length > 0 ? focusableElems : [this.dialog];
     [this.firstFocusableElement] = this.focusableElements;
@@ -208,6 +247,14 @@ export default class Dialog {
     }
   }
 
+  [addObserver]() {
+    this.observer.observe(this.dialog, { attributeFilter: ['role'], subtree: true });
+  }
+
+  [removeObserver]() {
+    this.observer.disconnect();
+  }
+
   open() {
     this.isOpen = true;
 
@@ -240,6 +287,7 @@ export default class Dialog {
   create() {
     this[addAttributes]();
     this[setFocusableElements]();
+    this[addObserver]();
 
     // if "isOpen" parameter is set to true when the dialog is created, then, open it
     if (this.isOpen) this.open();
@@ -251,6 +299,7 @@ export default class Dialog {
   destroy() {
     this[removeAttributes]();
     this[removeEventListeners]();
+    this[removeObserver]();
 
     // remove event listener to each opening trigger linked to dialog
     this.openingTriggers.forEach(openingTrigger => openingTrigger.removeEventListener('click', this.toggle));
