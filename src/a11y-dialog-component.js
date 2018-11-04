@@ -116,6 +116,9 @@ export default class Dialog {
     triggerActiveClass = customConfig.triggerActiveClass,
     transitionDuration = customConfig.transitionDuration,
   } = {}) {
+    // if the dialog doesn't exist, return an empty constructor
+    if (!document.querySelector(dialogSelector)) return;
+
     // save the initial configuration
     this.config = {
       dialogSelector,
@@ -159,6 +162,10 @@ export default class Dialog {
 
     // add mutation observer to update focusable elements when a nested dialog is created
     this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
+
+    // dialog state
+    this.isInitialized = true;
+    this.isCreated = false;
   }
 
   [onClick](event) {
@@ -287,6 +294,8 @@ export default class Dialog {
   }
 
   open() {
+    if (!this.isInitialized || !this.isCreated) return;
+
     this.isOpen = true;
     this.documentIsAlreadyDisabled = this.document.classList.contains(this.config.documentDisabledClass);
 
@@ -298,6 +307,8 @@ export default class Dialog {
   }
 
   close(event) {
+    if (!this.isInitialized || !this.isCreated) return;
+
     this.isOpen = false;
 
     this[setAttributes]();
@@ -312,6 +323,8 @@ export default class Dialog {
   }
 
   toggle(event) {
+    if (!this.isInitialized || !this.isCreated) return;
+
     // save the current opening trigger if it exists
     if (event) this.currentOpeningTrigger = event.currentTarget;
 
@@ -319,6 +332,8 @@ export default class Dialog {
   }
 
   create() {
+    if (!this.isInitialized) return;
+
     this[addAttributes]();
     this[setFocusableElements]();
     this[addObserver]();
@@ -328,9 +343,13 @@ export default class Dialog {
 
     // add event listener to each opening trigger linked to dialog
     this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
+
+    this.isCreated = true;
   }
 
   destroy() {
+    if (!this.isInitialized || !this.isCreated) return;
+
     this[removeAttributes]();
     this[removeEventListeners]();
     this[removeObserver]();
