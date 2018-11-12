@@ -314,7 +314,7 @@ const Dialogs = (() => {
     }
 
     hide(event, restoreFocus = true) {
-      if (event) event.preventDefault();
+      if (event && restoreFocus) event.preventDefault();
 
       this.isShown = false;
 
