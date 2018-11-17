@@ -1,4 +1,4 @@
-/* dialogs
+/* a11y-dialog-component
  ========================================================================== */
 
 // save the global default configuration
