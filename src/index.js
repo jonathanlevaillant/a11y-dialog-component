@@ -160,7 +160,7 @@ export default class Dialog {
     this[onKeydown] = this[onKeydown].bind(this);
     this[switchFocus] = this[switchFocus].bind(this);
 
-    // add mutation observer to update focusable elements when a nested dialog is created
+    // add mutation observer to update focusable elements
     this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
 
     // dialog state
@@ -286,7 +286,7 @@ export default class Dialog {
   }
 
   [addObserver]() {
-    this.observer.observe(this.dialog, { attributeFilter: ['role'], subtree: true });
+    this.observer.observe(this.dialog, { childList: true, attributes: true, subtree: true });
   }
 
   [removeObserver]() {
@@ -294,7 +294,7 @@ export default class Dialog {
   }
 
   open() {
-    if (!this.isInitialized || !this.isCreated) return;
+    if (!this.isInitialized || !this.isCreated || this.isOpen) return;
 
     this.isOpen = true;
     this.documentIsAlreadyDisabled = this.document.classList.contains(this.config.documentDisabledClass);
@@ -307,7 +307,7 @@ export default class Dialog {
   }
 
   close(event) {
-    if (!this.isInitialized || !this.isCreated) return;
+    if (!this.isInitialized || !this.isCreated || !this.isOpen) return;
 
     this.isOpen = false;
 
@@ -332,7 +332,9 @@ export default class Dialog {
   }
 
   create() {
-    if (!this.isInitialized) return;
+    if (!this.isInitialized || this.isCreated) return;
+
+    this.isCreated = true;
 
     this[addAttributes]();
     this[setFocusableElements]();
@@ -343,12 +345,12 @@ export default class Dialog {
 
     // add event listener to each opening trigger linked to dialog
     this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
-
-    this.isCreated = true;
   }
 
   destroy() {
     if (!this.isInitialized || !this.isCreated) return;
+
+    this.isCreated = false;
 
     this[removeAttributes]();
     this[removeEventListeners]();
