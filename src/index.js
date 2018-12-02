@@ -152,7 +152,7 @@ export default class Dialog {
     this.lastFocusableElement = null;
     this.currentOpeningTrigger = null;
 
-    this.isOpen = isOpen;
+    this.isOpen = false;
 
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -163,9 +163,16 @@ export default class Dialog {
     // add mutation observer to update focusable elements
     this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
 
-    // dialog state
-    this.isInitialized = true;
-    this.isCreated = false;
+    // create the dialog
+    this.isCreated = true;
+
+    this[addAttributes]();
+    this[setFocusableElements]();
+    this[addObserver]();
+
+    if (isOpen) this.open();
+
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
   }
 
   [onClick](event) {
@@ -209,7 +216,7 @@ export default class Dialog {
   [addAttributes]() {
     this.dialog.setAttribute('role', 'dialog');
     this.dialog.setAttribute('tabindex', -1);
-    this.dialog.setAttribute('aria-hidden', !this.isOpen);
+    this.dialog.setAttribute('aria-hidden', true);
 
     if (this.config.labelledby) this.dialog.setAttribute('aria-labelledby', this.config.labelledby);
     if (this.config.describedby) this.dialog.setAttribute('aria-describedby', this.config.describedby);
@@ -294,7 +301,7 @@ export default class Dialog {
   }
 
   open() {
-    if (!this.isInitialized || !this.isCreated || this.isOpen) return;
+    if (!this.isCreated || this.isOpen) return;
 
     this.isOpen = true;
     this.documentIsAlreadyDisabled = this.document.classList.contains(this.config.documentDisabledClass);
@@ -307,7 +314,7 @@ export default class Dialog {
   }
 
   close(event) {
-    if (!this.isInitialized || !this.isCreated || !this.isOpen) return;
+    if (!this.isCreated || !this.isOpen) return;
 
     this.isOpen = false;
 
@@ -323,7 +330,7 @@ export default class Dialog {
   }
 
   toggle(event) {
-    if (!this.isInitialized || !this.isCreated) return;
+    if (!this.isCreated) return;
 
     // save the current opening trigger if it exists
     if (event) this.currentOpeningTrigger = event.currentTarget;
@@ -331,24 +338,8 @@ export default class Dialog {
     this.isOpen ? this.close(event) : this.open();
   }
 
-  create() {
-    if (!this.isInitialized || this.isCreated) return;
-
-    this.isCreated = true;
-
-    this[addAttributes]();
-    this[setFocusableElements]();
-    this[addObserver]();
-
-    // if "isOpen" parameter is set to true when the dialog is created, then, open it
-    if (this.isOpen) this.open();
-
-    // add event listener to each opening trigger linked to dialog
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
-  }
-
   destroy() {
-    if (!this.isInitialized || !this.isCreated) return;
+    if (!this.isCreated) return;
 
     this.isCreated = false;
 
