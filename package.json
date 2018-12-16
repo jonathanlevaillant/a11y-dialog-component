@@ -1,32 +1,9 @@
 {
   "name": "a11y-dialog-component",
-  "description": "Accessible Dialog Component in Vanilla JS",
   "version": "5.0.0",
-  "keywords": [
-    "dialog",
-    "modal",
-    "a11y",
-    "accessibility",
-    "aria",
-    "es6",
-    "es2015",
-    "vanilla js"
-  ],
+  "description": "Vanilla JS Accessible Dialog Library",
   "author": "Jonathan Levaillant <jonathan.levaillant@outlook.com> (http://jonathanlevaillant.fr)",
-  "scripts": {
-    "dev": "rollup -cwm",
-    "build": "rollup -c",
-    "prepare": "yarn run build"
-  },
-  "main": "dist/a11y-dialog-component.js",
-  "module": "dist/a11y-dialog-component.esm.js",
-  "jsnext:main": "dist/a11y-dialog-component.esm.js",
-  "jsdelivr": "dist/a11y-dialog-component.min.js",
-  "files": [
-    "dist/a11y-dialog-component.js",
-    "dist/a11y-dialog-component.es.js",
-    "dist/a11y-dialog-component.min.js"
-  ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/jonathanlevaillant/a11y-dialog-component.git"
@@ -35,7 +12,27 @@
     "url": "https://github.com/jonathanlevaillant/a11y-dialog-component/issues",
     "email": "jonathan.levaillant@outlook.com"
   },
-  "license": "MIT",
+  "keywords": [
+    "dialog",
+    "modal",
+    "non-modal",
+    "tooltip",
+    "a11y",
+    "accessible",
+    "vanilla js"
+  ],
+  "main": "dist/a11y-dialog-component.js",
+  "jsdelivr": "dist/a11y-dialog-component.min.js",
+  "module": "dist/a11y-dialog-component.esm.js",
+  "jsnext:main": "dist/a11y-dialog-component.esm.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "rollup -cw",
+    "build": "rm -rf dist && rollup -c",
+    "prepare": "npm run build"
+  },
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
