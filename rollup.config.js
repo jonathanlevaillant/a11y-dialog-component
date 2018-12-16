@@ -14,13 +14,13 @@ const cjs = {
   output: {
     file: 'dist/a11y-dialog-component.js',
     format: 'cjs',
-    exports: 'named'
+    exports: 'named',
   },
   plugins: [
     babel({
       exclude: 'node_modules/**',
-    })
-  ]
+    }),
+  ],
 };
 
 // Keep the bundle as an ES module file
@@ -29,25 +29,28 @@ const esm = {
   output: {
     file: 'dist/a11y-dialog-component.esm.js',
     format: 'esm',
-  }
+  },
 };
 
 // A self-executing function, suitable for inclusion as a <script> tag
 const iife = {
   input: 'src/index.js',
   output: {
-    file: 'dist/a11y-dialog-component.min.js',
+    file: `dist/a11y-dialog-component${production ? '.min' : ''}.js`,
     format: 'iife',
     name: 'Dialog',
-    exports: 'named'
+    exports: 'named',
+    sourcemap: true,
   },
   plugins: [
     !production && eslint(),
     babel({
       exclude: 'node_modules/**',
     }),
-    production && uglify()
-  ]
+    production && uglify({
+      sourcemap: true,
+    }),
+  ],
 };
 
 production ? bundle.push(cjs, esm, iife) : bundle.push(iife);
