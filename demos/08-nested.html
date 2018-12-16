@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>a11y-dialog-component : Nested dialogs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <h1>Dialog</h1>
+  <h2>Nested dialogs</h2>
+  <button type="button" class="js-dialog-open">Open dialog</button>
+  <div class="c-dialog js-dialog">
+    <div class="c-dialog__inner">
+      <h2 id="dialog-title">Dialog title</h2>
+      <p id="dialog-desc">Dialog description</p>
+      <form>
+        <p>
+          <label for="dialog-firstname">First Name</label><br />
+          <input type="text" id="dialog-firstname" />
+        </p>
+        <p>
+          <label for="dialog-lastname">Last Name</label><br />
+          <input type="text" id="dialog-lastname" />
+        </p>
+        <p>
+          <button type="button" class="js-dialog-close">Cancel</button>
+          <button type="button" class="js-dialog-open-2">Open dialog 2</button>
+          <button type="button">Submit</button>
+        </p>
+      </form>
+      <div class="c-dialog js-dialog-2">
+        <div class="c-dialog__inner">
+          <h2 id="dialog-title-2">Dialog title 2</h2>
+          <p id="dialog-desc-2">Dialog description 2</p>
+          <form>
+            <p>
+              <label for="dialog-address">Address</label><br />
+              <input type="text" id="dialog-address" />
+            </p>
+          </form>
+          <p>
+            <button type="button" class="js-dialog-close-2">Cancel</button>
+            <button type="button">Submit</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- a11y-dialog-component -->
+  <script src="../dist/a11y-dialog-component.min.js"></script>
+
+  <!-- Create a new dialog -->
+  <script>
+    const dialog = new Dialog.default('.js-dialog', {
+      openingSelector: '.js-dialog-open',
+      closingSelector: '.js-dialog-close',
+      labelledby: 'dialog-title',
+      describedby: 'dialog-desc',
+    });
+
+    const tooltip = new Dialog.default('.js-dialog-2', {
+      openingSelector: '.js-dialog-open-2',
+      closingSelector: '.js-dialog-close-2',
+      labelledby: 'dialog-title-2',
+      describedby: 'dialog-desc-2',
+    });
+  </script>
+</body>
+</html>
