@@ -1,0 +1,84 @@
+/* main.css
+ ========================================================================== */
+
+/* Document */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+html.is-disabled,
+html.is-inactive {
+  overflow: hidden;
+}
+
+body {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 1.4em;
+}
+
+/* Form */
+input {
+  width: 100%;
+  margin-top: .5em;
+  padding: .75em;
+  font: inherit;
+  border: .1em solid #aaa;
+}
+
+button {
+  padding: 1em;
+  background: #ddd;
+  font: inherit;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Dialog */
+.c-dialog {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  background-color: #fff;
+  transition: .2s;
+}
+
+.c-dialog[aria-hidden="true"] {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.c-dialog__inner {
+  width: 50%;
+  margin: auto;
+  padding: 1em 2em;
+}
+
+/* Backdrop dialog */
+.c-dialog--backdrop {
+  background-color: rgba(0, 0, 0, .5);
+  cursor: pointer;
+}
+
+.c-dialog--backdrop .c-dialog__inner {
+  background-color: #fff;
+  cursor: auto;
+}
+
+/* Non-modal dialog */
+.c-dialog--non-modal {
+  position: static;
+  width: 50%;
+}
+
+.c-dialog--non-modal .c-dialog__inner {
+  width: 100%;
+  border: .1em solid #aaa;
+}

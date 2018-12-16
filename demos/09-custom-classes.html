@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>a11y-dialog-component : Custom classes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body class="js-body">
+  <h1>Dialog</h1>
+  <h2>Custom classes</h2>
+  <button type="button" class="js-dialog-open">Open dialog</button>
+  <div class="c-dialog js-dialog">
+    <div class="c-dialog__inner">
+      <h2 id="dialog-title">Dialog title</h2>
+      <p id="dialog-desc">Dialog description</p>
+      <form>
+        <p>
+          <label for="dialog-firstname">First Name</label><br />
+          <input type="text" id="dialog-firstname" />
+        </p>
+        <p>
+          <label for="dialog-lastname">Last Name</label><br />
+          <input type="text" id="dialog-lastname" />
+        </p>
+        <p>
+          <button type="button" class="js-dialog-close">Cancel</button>
+          <button type="button">Submit</button>
+        </p>
+      </form>
+    </div>
+  </div>
+  <!-- a11y-dialog-component -->
+  <script src="../dist/a11y-dialog-component.js"></script>
+
+  <!-- Create a new dialog -->
+  <script>
+    // Update the global configuration
+    Dialog.setDefaults({
+      documentSelector: '.js-body',
+      documentDisabledClass: 'is-inactive',
+      openingTriggerActiveClass: 'is-expanded',
+    });
+
+    const dialog = new Dialog.default('.js-dialog', {
+      openingSelector: '.js-dialog-open',
+      closingSelector: '.js-dialog-close',
+      labelledby: 'dialog-title',
+      describedby: 'dialog-desc',
+    });
+  </script>
+</body>
+</html>

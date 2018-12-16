@@ -1,32 +1,9 @@
 {
   "name": "a11y-dialog-component",
-  "description": "Accessible Dialog Component in Vanilla JS",
-  "version": "4.4.4",
-  "keywords": [
-    "dialog",
-    "modal",
-    "a11y",
-    "accessibility",
-    "aria",
-    "es6",
-    "es2015",
-    "vanilla js"
-  ],
+  "version": "5.0.0",
+  "description": "Vanilla JS Accessible Dialog Library",
   "author": "Jonathan Levaillant <jonathan.levaillant@outlook.com> (http://jonathanlevaillant.fr)",
-  "scripts": {
-    "start": "yarn",
-    "dev": "gulp && gulp demo && gulp watch",
-    "build": "rm -rf ./dist && gulp && gulp --env production",
-    "prepare": "yarn run build"
-  },
-  "main": "dist/a11y-dialog-component.js",
-  "module": "dist/a11y-dialog-component.es.js",
-  "jsdelivr": "dist/a11y-dialog-component.min.js",
-  "files": [
-    "dist/a11y-dialog-component.js",
-    "dist/a11y-dialog-component.es.js",
-    "dist/a11y-dialog-component.min.js"
-  ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/jonathanlevaillant/a11y-dialog-component.git"
@@ -35,21 +12,35 @@
     "url": "https://github.com/jonathanlevaillant/a11y-dialog-component/issues",
     "email": "jonathan.levaillant@outlook.com"
   },
-  "license": "MIT",
+  "keywords": [
+    "dialog",
+    "modal",
+    "non-modal",
+    "tooltip",
+    "a11y",
+    "accessible",
+    "vanilla js"
+  ],
+  "main": "dist/a11y-dialog-component.js",
+  "jsdelivr": "dist/a11y-dialog-component.min.js",
+  "module": "dist/a11y-dialog-component.esm.js",
+  "jsnext:main": "dist/a11y-dialog-component.esm.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "rollup -cw",
+    "build": "rm -rf dist && rollup -c",
+    "prepare": "npm run build"
+  },
   "devDependencies": {
-    "babel-core": "^6.26.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babelify": "^8.0.0",
-    "browserify": "^15.2.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "gulp": "^3.9.1",
-    "gulp-eslint": "^4.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^2.6.3",
-    "gulp-uglify-es": "^1.0.0",
-    "vinyl-buffer": "^1.0.1",
-    "vinyl-source-stream": "^2.0.0"
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "rollup": "^0.68.0",
+    "rollup-plugin-babel": "^4.1.0",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-uglify": "^6.0.0"
   }
 }
