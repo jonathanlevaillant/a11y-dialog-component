@@ -36,7 +36,27 @@ const esm = {
 const iife = {
   input: 'src/index.js',
   output: {
-    file: `dist/a11y-dialog-component${production ? '.min' : ''}.js`,
+    file: 'dist/a11y-dialog-component.min.js',
+    format: 'iife',
+    name: 'Dialog',
+    exports: 'named',
+    sourcemap: true,
+  },
+  plugins: [
+    babel({
+      exclude: 'node_modules/**',
+    }),
+    uglify({
+      sourcemap: true,
+    }),
+  ],
+};
+
+// Required for demo bundle and development environment
+const demo = {
+  input: 'src/index.js',
+  output: {
+    file: `demos/js/a11y-dialog-component.js`,
     format: 'iife',
     name: 'Dialog',
     exports: 'named',
@@ -47,12 +67,9 @@ const iife = {
     babel({
       exclude: 'node_modules/**',
     }),
-    production && uglify({
-      sourcemap: true,
-    }),
   ],
 };
 
-production ? bundle.push(cjs, esm, iife) : bundle.push(iife);
+production ? bundle.push(cjs, esm, iife, demo) : bundle.push(demo);
 
 export default bundle;
