@@ -1,214 +1,218 @@
-<h3 align="center">A11Y Dialog Component</h3>
+# A11y Dialog Component
 
----
+a11y-dialog-component is a fast, lightweight and flexible vanilla JavaScript library to create accessible modal, non-modal or tooltip dialogs.
+ 
+These dialogs are fully accessible according to [WAI-ARIA Authoring Practices 1.2](https://www.w3.org/TR/wai-aria-practices-1.2/#dialog_modal).
 
-## Introduction
+## Getting Started
 
-**a11y-dialog-component** est une librairie écrite en JavaScript natif permettant de configurer facilement des
-fenêtres modales accessibles.
+### Installing
 
-Cette librairie respecte l'ensemble des critères d'accessibilité définis par 
-[WAI-ARIA](https://www.w3.org/TR/wai-aria-practices-1.1/#dialog_modal) tout en étant très légère (1.3 Ko minifiée et gzippée)
-et simple à configurer.
+A simple and fast way to get started is to include this script on your page.
+This will create the global variable `Dialog`
 
-## Fonctionnalités
-
-- À l'ouverture d'une fenêtre modale, le focus clavier se positionne sur le premier élément focalisable de la fenêtre. 
-- L'ordre de tabulation est contenu dans la fenêtre modale (touches `Tab` et `Shift + Tab`).
-- Presser la touche `Escape` permet de fermer la fenêtre modale.
-- Un clic en dehors d'une fenêtre modale ou sur un élément possédant l'attribut `data-dismiss` permet de fermer celle-ci.
-- À la fermeture d'une fenêtre modale, le focus clavier est restauré sur le bouton d'appel.
-- Possibilité d'imbriquer plusieurs fenêtres modales dans une même page.
-
-## Installation
-
-- via [npm](https://www.npmjs.com/) : `npm install a11y-dialog-component`
-- via [yarn](https://yarnpkg.com/lang/en/) : `yarn add a11y-dialog-component`
-- via [jsDelivr](https://www.jsdelivr.com/) : `<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component/dist/a11y-dialog-component.min.js"></script>`
-
-## Utilisation
-
-#### 1. Structure HTML du document
-
-Afin de répondre aux critères d'accessibilité définis par WAI-ARIA, le contenu principal du document HTML doit être 
-désactivé à l'ouverture d'une fenêtre modale. Il est également recommandé de désactiver le scroll vertical.
-
-Pour que la librairie JavaScript puisse cibler ces éléments, il est conseillé d'ajouter dans le document HTML ces sélecteurs de classe :
-
-- Sélecteur CSS requis pour la désactivation du scroll vertical (à ajouter généralement sur la balise `<html>` ou `<body>`) : `js-document`
-- Sélecteur CSS requis pour la désactivation du contenu principal du document (nécessaire aux lecteurs d'écran) : `js-inert-layer`
-
-```
-<!doctype html>
-<html class="js-document">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>A11Y Dialog Component</title>
-  </head>
-  <body>
-    <main class="js-inert-layer">...</main>
-    <div role="dialog">...</div>
-  </body>
-</html>
-
+```html
+<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.0.3/dist/a11y-dialog-component.min.js"></script>
 ```
 
-Il est à noter que la fenêtre modale doit se situer en dehors du contenu principal du document.
+If you prefer to install a11y-dialog-component locally in your project, you can either:
 
-#### 2. Structure HTML d'un bouton d'appel (trigger)
-
-**Attributs obligatoires :**
-
-- L'attribut de données `data-component="dialog"` permet d'instancier une nouvelle fenêtre modale.
-- L'attribut de données `data-target="dialog-ID"` permet de cibler une fenêtre modale avec l'identifiant `dialog-ID`
-- L'attribut ARIA `aria-haspopup="dialog"` indique aux lecteurs d'écran que l'activation du bouton d'appel déclenchera 
-l'ouverture d'une fenêtre modale.
+**Install with NPM**
 
 ```
-<button type="button" aria-haspopup="dialog" data-component="dialog" data-target="dialog-demo">Open dialog</button>
+npm install a11y-dialog-component
 ```
 
-**Attributs facultatifs :**
-
-- `data-open="true"` : Déclenche l'ouverture de la fenêtre modale au chargement de la page.
-- `data-disabled-page="false"` : Laisse le document actif à l'ouverture de la fenêtre modale. 
-
-#### 3. Structure HTML d'une fenêtre modale
-
-**Attention : Une fenêtre modale doit posséder un identifiant unique !**
-
-Afin de répondre aux critères d'accessibilité définis par WAI-ARIA, il est conseillé d'utiliser la structure suivante :
+**Install with Yarn**
 
 ```
-<div id="dialog-demo" class="c-dialog" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="dialog-title" aria-describedby="dialog-description" tabindex="-1">
-  <div role="document" class="c-dialog__box">
-    <h2 id="dialog-title">Dialog title</h2>
-    <div id="dialog-description">Dialog description</div>
-  </div>
-</div>    
+yarn add a11y-dialog-component
 ```
 
-Pour davantage de précisions sur ces attributs, vous pouvez vous rendre sur le [blog de JoliCode](https://jolicode.com/blog/une-fenetre-modale-accessible)
+### Basic Usage
 
-#### 4. Structure HTML d'un bouton de fermeture
+Should you install a11y-dialog-component locally, you can import it as ES module like the following:
 
-Un bouton de fermeture doit posséder l'attribut `data-dismiss`
-
-```
-<button type="button" aria-label="Close this window" data-dismiss>X</button>
+```js
+import Dialog from 'a11y-dialog-component';
 ```
 
-#### 5. Ajout de la librairie JavaScript
+It's also possible to use the `require` CommonJS syntax:
 
-Vous pouvez importer directement **a11y-dialog-component** dans votre projet JavaScript 
-en utilisant une syntaxe ES6 (ES2015) ou CommonJS :
-
-```
-import Dialogs from 'a11y-dialog-component'; // es6 module
-const Dialogs = require('a11y-dialog-component').default; // commonjs module
+```js
+const Dialog = require('a11y-dialog-component').default;
 ```
 
-#### 6. Instanciation JavaScript
+Finally, let's create a basic dialog:
 
+**HTML**
+
+```html
+<!-- Opening trigger -->
+<button type="button" class="js-dialog-open">Open dialog</button>
+
+<!-- Dialog -->
+<div class="c-dialog js-dialog">
+  <h2 id="dialog-title">Hello! I'm an accessible dialog</h2>
+  <button type="button" class="js-dialog-close">Cancel</button>
+</div> 
 ```
-Dialogs.init();
-```
 
-#### 7. Personnalisation des sélecteurs CSS
+**JavaScript**
 
-Il est possible de personnaliser les sélecteurs CSS utilisés lors de l'instanciation des fenêtres modales :
-
-```
-Dialogs.init({
-  pageClassName: 'js-custom-document',
-  inertLayersClassName: 'js-custom-inert-layer',
-  disabledPageClassName: 'is-inactive',
+```js
+const dialog = new Dialog('.js-dialog', {
+  openingSelector: '.js-dialog-open',
+  closingSelector: '.js-dialog-close',
+  labelledby: 'dialog-title',
 });
 ```
 
-#### 8. Événements JavaScript
+**CSS**
 
-En cas de besoin, vous pouvez déclencher l'ouverture ou la fermeture d'une ou plusieurs fenêtres modales directement en JavaScript
-grâce aux méthodes `open('dialog-ID')` et `close('dialog-ID')` :
-
-```
-Dialogs.open('dialog-demo');
-Dialogs.open('dialog-nested');
-Dialogs.close('dialog-demo');
-```
-
-**Paramètres facultatifs :**
-
-- `triggerId: 'trigger-ID'` : Associe la fenêtre modale à un bouton d'appel. 
-- `disabledPage: false` : Laisse le document actif à l'ouverture de la fenêtre modale.
-
-```
-Dialogs.open('dialog-demo', {
-  triggerId: 'js-trigger-demo',
-  disabledPage: false,
-});
-```
-
-#### 9. Styles CSS
-
-**a11y-dialog-component** a fait le choix de ne pas embarquer de styles CSS par défaut.  
-Vous êtes donc libres d'utiliser les styles que vous souhaitez !
-
-Néanmoins, nous recommandons au minimum ces styles nécessaires à l'ouverture et à la fermeture d'une fenêtre modale :
-
-```
-.c-dialog {
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  background-color: rgba(0, 0, 0, .75);
-}
-
-.c-dialog__box {
-  max-width: 48rem;
-  margin: auto;
-  background-color: #fff;
-}
-
+```css
 .c-dialog[aria-hidden="true"] {
   display: none;
 }
 ```
 
-Si vous désirez utiliser des styles CSS par défaut, vous pouvez consulter le fichier `main.css` de la démo disponible 
-[ici](https://github.com/jonathanlevaillant/a11y-dialog-component/blob/master/demo/src/main.css)
+This previous code will generate, as if by magic, an accessible dialog:
 
-## Contribution
+```html
+<!-- Opening trigger -->
+<button type="button" class="js-dialog-open" aria-haspopup="dialog">Open dialog</button>
 
-Si vous désirez contribuer à ce projet, rien de plus simple, suivez ces quelques étapes ! :kissing_closed_eyes:
-**a11y-dialog-component** suit les standards de développement JavaScript ES2015.
+<!-- Dialog -->
+<div class="c-dialog js-dialog" role="dialog" tabindex="-1" aria-hidden="true" aria-modal="true" aria-labelledby="dialog-title">
+  <h2 id="dialog-title">Hello! I'm an accessible dialog</h2>
+  <button type="button" class="js-dialog-close">Cancel</button>
+</div> 
+```
 
-#### Environnement de développement
+## Configuration
 
-1. Clonez le dépôt GitHub : `$git clone https://github.com/jonathanlevaillant/a11y-dialog-component.git`
-2. Installez le gestionnaire de packages [yarn](https://yarnpkg.com/en/docs/install#mac-tab)
-3. Installez les dépendances de développement : `yarn start`
-4. Lancez le projet (watch) : `yarn dev`
-5. Créez une pull-request :ok_hand:
+### Global
 
-## D'autres librairies accessibles ?
+Use the `setDefaults()` function to change the default configuration for dialogs. It will apply these settings to every future instance.
 
-- [a11y-accordion-component](https://github.com/jonathanlevaillant/a11y-accordion-component) - Accordéons accessibles.
+```js
+import Dialog, { setDefaults } from 'a11y-dialog-component';
 
-## Créateur
+setDefaults({
+  documentSelector: '.js-page',
+  delay: 400,
+});
+```
 
-**Jonathan Levaillant**
+Below is a list of all possible options to change the default configuration.
 
-- [https://twitter.com/jlwebart](https://twitter.com/jlwebart)
-- [https://github.com/jonathanlevaillant](https://github.com/jonathanlevaillant)
+| Option                          | Default           | Value             | Description                                                                                                                                                           |
+| ------------------------------- | ----------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **documentSelector**            | `.js-document`    | `String`          | CSS selector used to target the main document.                                                                                                                        |
+| **documentDisabledClass**       | `is-disabled`     | `String`          | Add a class on the document (defined by `documentSelector`) while the dialog is open and if `disableScroll: true`.                                                    |
+| **openingTriggerActiveClass**   | `is-active`       | `String`          | Add a class on the opening trigger while the dialog is open.                                                                                                          |
+| **delay**                       | `200`             | `Number`          | Delay in ms once a trigger event is fired before the dialog autofocus. Usually matches with the CSS transition value to open or close this dialog.                    |
 
-## Licence
+### Options
 
-Ce projet est sous licence [MIT](https://opensource.org/licenses/MIT).
+Below is a list of all possible options you can pass to a dialog.
+
+| Option                          | Default           | Value             | Description                                                                                                                                                           |
+| ------------------------------- | ----------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **onOpen**                      | `noop`            | `Function`        | Lifecycle function invoked when the dialog is opening. The function receives the dialog object as the first parameter.                                                |
+| **onClose**                     | `noop`            | `Function`        | Lifecycle function invoked when the dialog is closing. The function receives the dialog object as the first parameter.                                                |
+| **openingSelector**             | `""`              | `String`          | CSS selector used to open the dialog.                                                                                                                                 |
+| **closingSelector**             | `""`              | `String`          | CSS selector used to close the dialog.                                                                                                                                |
+| **backdropSelector**            | `""`              | `String`          | CSS selector used to include a backdrop element which close the dialog on click.                                                                                      |
+| **labelledby**                  | `""`              | `String`          | ID selector to provide a dialog label (a11y compliant).                                                                                                               |
+| **describedby**                 | `""`              | `String`          | ID selector to provide a dialog description (a11y compliant).                                                                                                         |
+| **isModal**                     | `true`            | `Boolean`         | If `true`, tells assistive technologies that the windows underneath the current dialog are not available for interaction `aria-modal="true"`.                         |
+| **isTooltip**                   | `false`           | `Boolean`         | If `true`, click outside the current dialog to close it.                                                                                                              |
+| **isOpen**                      | `false`           | `Boolean`         | If `true`, open the dialog when initialized.                                                                                                                          |
+| **disableScroll**               | `true`            | `Boolean`         | If `true`, disable scrolling on the page while the dialog is open.                                                                                                    |
+| **openingTriggerActiveClass**   | `is-active`       | `String`          | Add a class on the opening trigger while the dialog is open.                                                                                                          |
+| **delay**                       | `200`             | `Number`          | Delay in ms once a trigger event is fired before the dialog autofocus. Usually matches with the CSS transition value to open or close this dialog.                    |
+
+### Methods
+
+Dialog instances have 4 methods available which allow you to control the dialog without the use of UI events.
+
+**Open the dialog**
+
+```js
+dialog.open();
+```
+
+**Close the dialog**
+
+```js
+dialog.close();
+```
+
+**Toggle the dialog**
+
+```js
+dialog.toggle();
+```
+
+**Destroy the dialog**
+
+```js
+dialog.destroy();
+```
+
+## Demos
+
+Didn't find the recipe that exactly matches your case? We have demos!
+
+The [demos](https://github.com/jonathanlevaillant/a11y-dialog-component/tree/master/demos) folder contains 10 use cases of a11y-dialog-component. You might find there what you're looking for.
+
+## Deployment
+
+On production use files only from `dist/` folder, there will be the most stable versions.
+
+a11y-dialog-component uses [Rollup](https://rollupjs.org/guide/en) to build a development and production versions.
+
+1. Install Rollup `npm install --global rollup`
+2. Clone Github repo `git clone https://github.com/jonathanlevaillant/a11y-dialog-component.git`
+3. Install all dependencies, in repo's root `npm install`
+
+### Development build
+
+```
+npm run dev
+```
+
+Development files (`iife`) will be available in `demos/js/` folder.
+
+### Production build
+
+```
+npm run build
+```
+
+Production files (`cjs`, `esm`, `iife`) will be available in `dist/` folder.
+
+## Contributing
+
+Please read [CONTRIBUTING.md](https://github.com/jonathanlevaillant/a11y-dialog-component/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+
+We use [SemVer](https://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/jonathanlevaillant/a11y-dialog-component/tags).
+
+## Authors
+
+* **Jonathan Levaillant** - *Initial work* - [jonathanlevaillant](https://github.com/jonathanlevaillant)
+
+See also the list of [contributors](https://github.com/jonathanlevaillant/a11y-dialog-component/graphs/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](https://github.com/jonathanlevaillant/a11y-dialog-component/blob/master/LICENSE.md) file for details
+
+## Acknowledgments
+
+<p>
+    <a href="https://jolicode.com/"><img src="https://jolicode.com/images/logo.svg" width=200 height=46 alt="JoliCode" /></a>
+</p>
