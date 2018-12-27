@@ -35,19 +35,21 @@
 
   <!-- Create a new dialog -->
   <script>
-    let dialog;
+    const dialog = new Dialog.default('.js-dialog', {
+      openingSelector: '.js-dialog-open',
+      closingSelector: '.js-dialog-close',
+      labelledby: 'dialog-title',
+      describedby: 'dialog-desc',
+      isCreated: false,
+    });
+
     let isCreated = false;
 
     const setDialog = () => {
       if (window.matchMedia("(min-width: 40.0625em)").matches && !isCreated) {
         isCreated = true;
 
-        dialog = new Dialog.default('.js-dialog', {
-          openingSelector: '.js-dialog-open',
-          closingSelector: '.js-dialog-close',
-          labelledby: 'dialog-title',
-          describedby: 'dialog-desc',
-        });
+        dialog.create();
       } else if (!window.matchMedia("(min-width: 40.0625em)").matches && isCreated) {
         isCreated = false;
 
