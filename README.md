@@ -12,7 +12,7 @@ A simple and fast way to get started is to include this script on your page.
 This will create the global variable `Dialog`
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.0.3/dist/a11y-dialog-component.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.1.0/dist/a11y-dialog-component.min.js"></script>
 ```
 
 If you prefer to install a11y-dialog-component locally in your project, you can either:
@@ -76,7 +76,7 @@ const dialog = new Dialog('.js-dialog', {
 }
 ```
 
-This previous code will generate, as if by magic, an accessible dialog:
+This previous code will generate an accessible dialog:
 
 ```html
 <!-- Opening trigger -->
@@ -128,6 +128,7 @@ Below is a list of all possible options you can pass to a dialog.
 | **describedby**                 | `""`              | `String`          | ID selector to provide a dialog description (a11y compliant).                                                                                                         |
 | **isModal**                     | `true`            | `Boolean`         | If `true`, tells assistive technologies that the windows underneath the current dialog are not available for interaction `aria-modal="true"`.                         |
 | **isTooltip**                   | `false`           | `Boolean`         | If `true`, click outside the current dialog to close it.                                                                                                              |
+| **isCreated**                   | `true`            | `Boolean`         | If `true`, create the dialog when initialized. If disabled, then you need to create it manually by using `create()` method.                                           |
 | **isOpen**                      | `false`           | `Boolean`         | If `true`, open the dialog when initialized.                                                                                                                          |
 | **disableScroll**               | `true`            | `Boolean`         | If `true`, disable scrolling on the page while the dialog is open.                                                                                                    |
 | **openingTriggerActiveClass**   | `is-active`       | `String`          | Add a class on the opening trigger while the dialog is open.                                                                                                          |
@@ -159,6 +160,14 @@ dialog.toggle();
 
 ```js
 dialog.destroy();
+```
+
+**Create the dialog**
+
+The `create()` method is **automatically called on instantiation** so there is no need to call it again directly (unless you have destroyed the dialog previously).
+
+```js
+dialog.create();
 ```
 
 ## Demos
