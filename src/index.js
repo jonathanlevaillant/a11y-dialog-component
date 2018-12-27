@@ -75,8 +75,8 @@ export default class Dialog {
       describedby,
       isModal,
       isTooltip,
-      isOpen,
       isCreated,
+      isOpen,
       disableScroll,
       documentSelector: customConfig.documentSelector,
       documentDisabledClass: customConfig.documentDisabledClass,
@@ -98,8 +98,8 @@ export default class Dialog {
     this.lastFocusableElement = null;
     this.currentOpeningTrigger = null;
 
-    this.isOpen = false;
     this.isCreated = false;
+    this.isOpen = false;
 
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
