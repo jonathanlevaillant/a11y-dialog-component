@@ -55,6 +55,7 @@ export default class Dialog {
     isModal = true,
     isTooltip = false,
     isOpen = false,
+    isCreated = true,
     disableScroll = true,
     openingTriggerActiveClass = customConfig.openingTriggerActiveClass,
     delay = customConfig.delay,
@@ -75,6 +76,7 @@ export default class Dialog {
       isModal,
       isTooltip,
       isOpen,
+      isCreated,
       disableScroll,
       documentSelector: customConfig.documentSelector,
       documentDisabledClass: customConfig.documentDisabledClass,
@@ -97,6 +99,7 @@ export default class Dialog {
     this.currentOpeningTrigger = null;
 
     this.isOpen = false;
+    this.isCreated = false;
 
     this.close = this.close.bind(this);
     this.toggle = this.toggle.bind(this);
@@ -108,15 +111,7 @@ export default class Dialog {
     this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
 
     // Create the dialog
-    this.isCreated = true;
-
-    this[addAttributes]();
-    this[setFocusableElements]();
-    this[addObserver]();
-
-    if (isOpen) this.open();
-
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
+    if (isCreated) this.create();
   }
 
   [onClick](event) {
@@ -278,7 +273,8 @@ export default class Dialog {
     this[removeEventListeners]();
 
     // Restore focus except for tooltip click events
-    if (this.currentOpeningTrigger && (!this.config.isTooltip || (this.config.isTooltip && event.type !== 'click'))) {
+    if (this.currentOpeningTrigger
+      && (!this.config.isTooltip || (this.config.isTooltip && event && event.type !== 'click'))) {
       this[restoreFocus]();
     }
 
@@ -294,8 +290,24 @@ export default class Dialog {
     this.isOpen ? this.close(event) : this.open();
   }
 
+  create() {
+    if (this.isCreated) return;
+
+    this.isCreated = true;
+
+    this[addAttributes]();
+    this[setFocusableElements]();
+    this[addObserver]();
+
+    if (this.config.isOpen) this.open();
+
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
+  }
+
   destroy() {
     if (!this.isCreated) return;
+
+    this.close();
 
     this.isCreated = false;
 
