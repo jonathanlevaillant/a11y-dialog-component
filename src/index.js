@@ -50,6 +50,7 @@ export default class Dialog {
     openingSelector,
     closingSelector,
     backdropSelector,
+    helperSelector,
     labelledby,
     describedby,
     isModal = true,
@@ -71,6 +72,7 @@ export default class Dialog {
       openingSelector,
       closingSelector,
       backdropSelector,
+      helperSelector,
       labelledby,
       describedby,
       isModal,
@@ -89,6 +91,7 @@ export default class Dialog {
     this.openingTriggers = document.querySelectorAll(openingSelector);
     this.closingTriggers = this.dialog.querySelectorAll(closingSelector);
     this.backdropTrigger = document.querySelector(backdropSelector);
+    this.helpers = document.querySelectorAll(helperSelector);
 
     this.document = document.querySelector(this.config.documentSelector) || document.querySelector('html');
     this.documentIsAlreadyDisabled = false;
@@ -180,6 +183,8 @@ export default class Dialog {
     this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
 
     if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.remove(this.config.openingTriggerActiveClass);
+
+    this.helpers.forEach(helper => helper.classList.remove(this.config.openingTriggerActiveClass));
   }
 
   [setAttributes]() {
@@ -202,6 +207,14 @@ export default class Dialog {
         });
       }
     }
+
+    this.helpers.forEach((helper) => {
+      if (this.isOpen) {
+        helper.classList.add(this.config.openingTriggerActiveClass);
+      } else {
+        helper.classList.remove(this.config.openingTriggerActiveClass);
+      }
+    });
   }
 
   [setFocusableElements]() {
