@@ -12,7 +12,7 @@ A simple and fast way to get started is to include this script on your page.
 This will create the global variable `Dialog`
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.1.0/dist/a11y-dialog-component.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.2.1/dist/a11y-dialog-component.min.js"></script>
 ```
 
 If you prefer to install a11y-dialog-component locally in your project, you can either:
