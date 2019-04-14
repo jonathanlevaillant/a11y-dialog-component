@@ -1,48 +1,48 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>a11y-dialog-component : Non-modal dialog</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="stylesheet" href="css/main.css">
-</head>
-<body>
-  <h1>Dialog</h1>
-  <h2>Non-modal dialog</h2>
-  <button type="button" class="js-dialog-open">Open dialog</button>
-  <div class="c-dialog c-dialog--non-modal js-dialog">
-    <div class="c-dialog__inner">
-      <h2 id="dialog-title">Dialog title</h2>
-      <p id="dialog-desc">Dialog description</p>
-      <form>
-        <p>
-          <label for="dialog-firstname">First Name</label><br />
-          <input type="text" id="dialog-firstname" />
-        </p>
-        <p>
-          <label for="dialog-lastname">Last Name</label><br />
-          <input type="text" id="dialog-lastname" />
-        </p>
-        <p>
-          <button type="button" class="js-dialog-close">Cancel</button>
-          <button type="button">Submit</button>
-        </p>
-      </form>
+  <head>
+    <meta charset="UTF-8" />
+    <title>a11y-dialog-component : Non-modal dialog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="stylesheet" href="css/main.css" />
+  </head>
+  <body>
+    <h1>Dialog</h1>
+    <h2>Non-modal dialog</h2>
+    <button type="button" class="js-dialog-open">Open dialog</button>
+    <div class="c-dialog c-dialog--non-modal js-dialog">
+      <div class="c-dialog__inner">
+        <h2 id="dialog-title">Dialog title</h2>
+        <p id="dialog-desc">Dialog description</p>
+        <form>
+          <p>
+            <label for="dialog-firstname">First Name</label><br />
+            <input type="text" id="dialog-firstname" />
+          </p>
+          <p>
+            <label for="dialog-lastname">Last Name</label><br />
+            <input type="text" id="dialog-lastname" />
+          </p>
+          <p>
+            <button type="button" class="js-dialog-close">Cancel</button>
+            <button type="button">Submit</button>
+          </p>
+        </form>
+      </div>
     </div>
-  </div>
-  <!-- a11y-dialog-component -->
-  <script src="js/a11y-dialog-component.js"></script>
+    <!-- a11y-dialog-component -->
+    <script src="js/a11y-dialog-component.js"></script>
 
-  <!-- Create a new dialog -->
-  <script>
-    const dialog = new Dialog.default('.js-dialog', {
-      openingSelector: '.js-dialog-open',
-      closingSelector: '.js-dialog-close',
-      labelledby: 'dialog-title',
-      describedby: 'dialog-desc',
-      isModal: false,
-      disableScroll: false,
-    });
-  </script>
-</body>
+    <!-- Create a new dialog -->
+    <script>
+      const dialog = new Dialog.default('.js-dialog', {
+        openingSelector: '.js-dialog-open',
+        closingSelector: '.js-dialog-close',
+        labelledby: 'dialog-title',
+        describedby: 'dialog-desc',
+        isModal: false,
+        disableScroll: false,
+      });
+    </script>
+  </body>
 </html>
