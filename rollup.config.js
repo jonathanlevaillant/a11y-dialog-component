@@ -3,7 +3,7 @@
 
 import babel from 'rollup-plugin-babel';
 import { uglify } from 'rollup-plugin-uglify';
-import { eslint } from "rollup-plugin-eslint";
+import { eslint } from 'rollup-plugin-eslint';
 
 const production = !process.env.ROLLUP_WATCH;
 const bundle = [];
@@ -56,7 +56,7 @@ const iife = {
 const demo = {
   input: 'src/index.js',
   output: {
-    file: `demos/js/a11y-dialog-component.js`,
+    file: 'demos/js/a11y-dialog-component.js',
     format: 'iife',
     name: 'Dialog',
     exports: 'named',
