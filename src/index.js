@@ -44,23 +44,26 @@ export function setDefaults({
 
 // Export the default Dialog() class
 export default class Dialog {
-  constructor(dialogSelector, {
-    onOpen = () => {},
-    onClose = () => {},
-    openingSelector,
-    closingSelector,
-    backdropSelector,
-    helperSelector,
-    labelledby,
-    describedby,
-    isModal = true,
-    isTooltip = false,
-    isOpen = false,
-    isCreated = true,
-    disableScroll = true,
-    openingTriggerActiveClass = customConfig.openingTriggerActiveClass,
-    delay = customConfig.delay,
-  } = {}) {
+  constructor(
+    dialogSelector,
+    {
+      onOpen = () => {},
+      onClose = () => {},
+      openingSelector,
+      closingSelector,
+      backdropSelector,
+      helperSelector,
+      labelledby,
+      describedby,
+      isModal = true,
+      isTooltip = false,
+      isOpen = false,
+      isCreated = true,
+      disableScroll = true,
+      openingTriggerActiveClass = customConfig.openingTriggerActiveClass,
+      delay = customConfig.delay,
+    } = {},
+  ) {
     // Check if the dialog exists, if not, return an empty constructor
     if (!document.querySelector(dialogSelector)) return;
 
@@ -111,7 +114,7 @@ export default class Dialog {
     this[switchFocus] = this[switchFocus].bind(this);
 
     // Add mutation observer to update focusable elements
-    this.observer = new MutationObserver((mutations => mutations.forEach(() => this[setFocusableElements]())));
+    this.observer = new MutationObserver(mutations => mutations.forEach(() => this[setFocusableElements]()));
 
     // Create the dialog
     if (isCreated) this.create();
@@ -202,13 +205,13 @@ export default class Dialog {
       if (this.isOpen) {
         this.currentOpeningTrigger.classList.add(this.config.openingTriggerActiveClass);
       } else {
-        this.openingTriggers.forEach((openingTrigger) => {
+        this.openingTriggers.forEach(openingTrigger => {
           openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
         });
       }
     }
 
-    this.helpers.forEach((helper) => {
+    this.helpers.forEach(helper => {
       if (this.isOpen) {
         helper.classList.add(this.config.openingTriggerActiveClass);
       } else {
@@ -286,8 +289,10 @@ export default class Dialog {
     this[removeEventListeners]();
 
     // Restore focus except for tooltip click events
-    if (this.currentOpeningTrigger
-      && (!this.config.isTooltip || (this.config.isTooltip && event && event.type !== 'click'))) {
+    if (
+      this.currentOpeningTrigger &&
+      (!this.config.isTooltip || (this.config.isTooltip && event && event.type !== 'click'))
+    ) {
       this[restoreFocus]();
     }
 
