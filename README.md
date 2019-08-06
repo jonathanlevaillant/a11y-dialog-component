@@ -127,23 +127,23 @@ Below is a list of all possible options to change the default configuration.
 
 Below is a list of all possible options you can pass to a dialog.
 
-| Option                          | Default     | Value      | Description                                                                                                                                        |
-| ------------------------------- | ----------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **onOpen**                      | `noop`      | `Function` | Lifecycle function invoked when the dialog is opening. The function receives the dialog object as the first parameter.                             |
-| **onClose**                     | `noop`      | `Function` | Lifecycle function invoked when the dialog is closing. The function receives the dialog object as the first parameter.                             |
-| **openingSelector**             | `""`        | `String`   | CSS selector used to open the dialog.                                                                                                              |
-| **closingSelector**             | `""`        | `String`   | CSS selector used to close the dialog.                                                                                                             |
-| **backdropSelector**            | `""`        | `String`   | CSS selector used to include a backdrop element which close the dialog on click.                                                                   |
-| **helperSelector**              | `""`        | `String`   | CSS selector used to add active class name(\*) while the dialog is open.                                                                           |
-| **labelledby**                  | `""`        | `String`   | ID selector to provide a dialog label (a11y compliant).                                                                                            |
-| **describedby**                 | `""`        | `String`   | ID selector to provide a dialog description (a11y compliant).                                                                                      |
-| **isModal**                     | `true`      | `Boolean`  | If `true`, tells assistive technologies that the windows underneath the current dialog are not available for interaction `aria-modal="true"`.      |
-| **isTooltip**                   | `false`     | `Boolean`  | If `true`, click outside the current dialog to close it.                                                                                           |
-| **isCreated**                   | `true`      | `Boolean`  | If `true`, create the dialog when initialized. If disabled, then you need to create it manually by using `create()` method.                        |
-| **isOpen**                      | `false`     | `Boolean`  | If `true`, open the dialog when initialized.                                                                                                       |
-| **disableScroll**               | `true`      | `Boolean`  | If `true`, disable scrolling on the page while the dialog is open.                                                                                 |
-| **openingTriggerActiveClass\*** | `is-active` | `String`   | Add a class on the opening trigger and helper selectors while the dialog is open.                                                                  |
-| **delay**                       | `200`       | `Number`   | Delay in ms once a trigger event is fired before the dialog autofocus. Usually matches with the CSS transition value to open or close this dialog. |
+| Option                          | Default     | Value      | Description                                                                                                                                                            |
+| ------------------------------- | ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **onOpen**                      | `noop`      | `Function` | Lifecycle function invoked when the dialog is opening. The function receives the dialog object as the first parameter and the opening trigger as the second parameter. |
+| **onClose**                     | `noop`      | `Function` | Lifecycle function invoked when the dialog is closing. The function receives the dialog object as the first parameter and the opening trigger as the second parameter. |
+| **openingSelector**             | `""`        | `String`   | CSS selector used to open the dialog.                                                                                                                                  |
+| **closingSelector**             | `""`        | `String`   | CSS selector used to close the dialog.                                                                                                                                 |
+| **backdropSelector**            | `""`        | `String`   | CSS selector used to include a backdrop element which close the dialog on click.                                                                                       |
+| **helperSelector**              | `""`        | `String`   | CSS selector used to add active class name(\*) while the dialog is open.                                                                                               |
+| **labelledby**                  | `""`        | `String`   | ID selector to provide a dialog label (a11y compliant).                                                                                                                |
+| **describedby**                 | `""`        | `String`   | ID selector to provide a dialog description (a11y compliant).                                                                                                          |
+| **isModal**                     | `true`      | `Boolean`  | If `true`, tells assistive technologies that the windows underneath the current dialog are not available for interaction `aria-modal="true"`.                          |
+| **isTooltip**                   | `false`     | `Boolean`  | If `true`, click outside the current dialog to close it.                                                                                                               |
+| **isCreated**                   | `true`      | `Boolean`  | If `true`, create the dialog when initialized. If disabled, then you need to create it manually by using `create()` method.                                            |
+| **isOpen**                      | `false`     | `Boolean`  | If `true`, open the dialog when initialized.                                                                                                                           |
+| **disableScroll**               | `true`      | `Boolean`  | If `true`, disable scrolling on the page while the dialog is open.                                                                                                     |
+| **openingTriggerActiveClass\*** | `is-active` | `String`   | Add a class on the opening trigger and helper selectors while the dialog is open.                                                                                      |
+| **delay**                       | `200`       | `Number`   | Delay in ms once a trigger event is fired before the dialog autofocus. Usually matches with the CSS transition value to open or close this dialog.                     |
 
 ### Methods
 
