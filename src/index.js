@@ -277,7 +277,7 @@ export default class Dialog {
     this[addEventListeners]();
     this[setFocus]();
 
-    this.config.onOpen(this.dialog);
+    this.config.onOpen(this.dialog, this.currentOpeningTrigger);
   }
 
   close(event) {
@@ -296,7 +296,7 @@ export default class Dialog {
       this[restoreFocus]();
     }
 
-    this.config.onClose(this.dialog);
+    this.config.onClose(this.dialog, this.currentOpeningTrigger);
   }
 
   toggle(event) {
