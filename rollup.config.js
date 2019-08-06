@@ -62,6 +62,9 @@ const demo = {
     exports: 'named',
     sourcemap: true,
   },
+  watch: {
+    clearScreen: false,
+  },
   plugins: [
     !production && eslint(),
     babel({
