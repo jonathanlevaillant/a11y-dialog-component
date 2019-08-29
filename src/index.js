@@ -285,6 +285,8 @@ export default class Dialog {
 
     this.isOpen = false;
 
+    if (event) event.preventDefault();
+
     this[setAttributes]();
     this[removeEventListeners]();
 
@@ -302,8 +304,12 @@ export default class Dialog {
   toggle(event) {
     if (!this.isCreated) return;
 
-    // Save the current opening trigger if it exists
-    if (event) this.currentOpeningTrigger = event.currentTarget;
+    if (event) {
+      event.preventDefault();
+
+      // Save the current opening trigger if it exists
+      this.currentOpeningTrigger = event.currentTarget;
+    }
 
     this.isOpen ? this.close(event) : this.open();
   }
