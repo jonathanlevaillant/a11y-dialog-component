@@ -9,6 +9,7 @@ import { getVisibleElements, getNoNestedElements } from './utils';
 // Use Symbols to create private methods
 const onClick = Symbol('onClick');
 const onKeydown = Symbol('onKeydown');
+const addEventDelegation = Symbol('addEventDelegation');
 const addEventListeners = Symbol('addEventListeners');
 const removeEventListeners = Symbol('removeEventListeners');
 const addAttributes = Symbol('addAttributes');
@@ -91,8 +92,7 @@ export default class Dialog {
 
     this.dialog = document.querySelector(dialogSelector);
     this.dialogArea = `${dialogSelector}, ${openingSelector}`;
-    this.openingTriggers = document.querySelectorAll(openingSelector);
-    this.closingTriggers = this.dialog.querySelectorAll(closingSelector);
+    this.openingTrigger = null;
     this.backdropTrigger = document.querySelector(backdropSelector);
     this.helpers = document.querySelectorAll(helperSelector);
 
@@ -102,7 +102,6 @@ export default class Dialog {
     this.focusableElements = [];
     this.firstFocusableElement = null;
     this.lastFocusableElement = null;
-    this.currentOpeningTrigger = null;
 
     this.isCreated = false;
     this.isOpen = false;
@@ -111,6 +110,7 @@ export default class Dialog {
     this.toggle = this.toggle.bind(this);
     this[onClick] = this[onClick].bind(this);
     this[onKeydown] = this[onKeydown].bind(this);
+    this[addEventDelegation] = this[addEventDelegation].bind(this);
     this[switchFocus] = this[switchFocus].bind(this);
 
     // Add mutation observer to update focusable elements
@@ -144,18 +144,32 @@ export default class Dialog {
     }
   }
 
+  [addEventDelegation](event) {
+    // https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
+    console.log(event.target.parentNode);
+
+    document.querySelectorAll(this.config.openingSelector).forEach(openingTrigger => {
+      if (event.target === openingTrigger) {
+        this.openingTrigger = openingTrigger;
+        this.toggle();
+      }
+    });
+
+    document.querySelectorAll(this.config.closingSelector).forEach(closingTrigger => {
+      if (event.target === closingTrigger) this.close();
+    });
+  }
+
   [addEventListeners]() {
     document.addEventListener('click', this[onClick], { capture: true });
     this.dialog.addEventListener('keydown', this[onKeydown]);
-    this.closingTriggers.forEach(closingTrigger => closingTrigger.addEventListener('click', this.close));
   }
 
   [removeEventListeners]() {
     document.removeEventListener('click', this[onClick], { capture: true });
     this.dialog.removeEventListener('keydown', this[onKeydown]);
-    this.closingTriggers.forEach(closingTrigger => closingTrigger.removeEventListener('click', this.close));
 
-    if (this.currentOpeningTrigger) this.currentOpeningTrigger.removeEventListener('keydown', this[switchFocus]);
+    if (this.openingTrigger) this.openingTrigger.removeEventListener('keydown', this[switchFocus]);
   }
 
   [addAttributes]() {
@@ -167,8 +181,6 @@ export default class Dialog {
     if (this.config.describedby) this.dialog.setAttribute('aria-describedby', this.config.describedby);
 
     if (this.config.isModal) this.dialog.setAttribute('aria-modal', true);
-
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.setAttribute('aria-haspopup', 'dialog'));
   }
 
   [removeAttributes]() {
@@ -183,9 +195,7 @@ export default class Dialog {
       this.document.classList.remove(this.config.documentDisabledClass);
     }
 
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
-
-    if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.remove(this.config.openingTriggerActiveClass);
+    if (this.openingTrigger) this.openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
 
     this.helpers.forEach(helper => helper.classList.remove(this.config.openingTriggerActiveClass));
   }
@@ -201,13 +211,11 @@ export default class Dialog {
       }
     }
 
-    if (this.currentOpeningTrigger) {
+    if (this.openingTrigger) {
       if (this.isOpen) {
-        this.currentOpeningTrigger.classList.add(this.config.openingTriggerActiveClass);
+        this.openingTrigger.classList.add(this.config.openingTriggerActiveClass);
       } else {
-        this.openingTriggers.forEach(openingTrigger => {
-          openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
-        });
+        this.openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
       }
     }
 
@@ -234,15 +242,15 @@ export default class Dialog {
   }
 
   [restoreFocus]() {
-    window.setTimeout(() => this.currentOpeningTrigger.focus(), this.config.delay);
+    window.setTimeout(() => this.openingTrigger.focus(), this.config.delay);
 
     // Switch focus between the current opening trigger and the non-modal dialog
-    if (this.isOpen) this.currentOpeningTrigger.addEventListener('keydown', this[switchFocus]);
+    if (this.isOpen) this.openingTrigger.addEventListener('keydown', this[switchFocus]);
   }
 
   [switchFocus](event) {
     if (event.key === keyCodes.f6) {
-      this.currentOpeningTrigger.removeEventListener('keydown', this[switchFocus]);
+      this.openingTrigger.removeEventListener('keydown', this[switchFocus]);
       this[setFocus]();
     }
   }
@@ -277,7 +285,7 @@ export default class Dialog {
     this[addEventListeners]();
     this[setFocus]();
 
-    this.config.onOpen(this.dialog, this.currentOpeningTrigger);
+    this.config.onOpen(this.dialog, this.openingTrigger);
   }
 
   close(event) {
@@ -291,27 +299,17 @@ export default class Dialog {
     this[removeEventListeners]();
 
     // Restore focus except for tooltip click events
-    if (
-      this.currentOpeningTrigger &&
-      (!this.config.isTooltip || (this.config.isTooltip && event && event.type !== 'click'))
-    ) {
+    if (this.openingTrigger && (!this.config.isTooltip || (this.config.isTooltip && event && event.type !== 'click'))) {
       this[restoreFocus]();
     }
 
-    this.config.onClose(this.dialog, this.currentOpeningTrigger);
+    this.config.onClose(this.dialog, this.openingTrigger);
   }
 
-  toggle(event) {
+  toggle() {
     if (!this.isCreated) return;
 
-    if (event) {
-      event.preventDefault();
-
-      // Save the current opening trigger if it exists
-      this.currentOpeningTrigger = event.currentTarget;
-    }
-
-    this.isOpen ? this.close(event) : this.open();
+    this.isOpen ? this.close() : this.open();
   }
 
   create() {
@@ -325,7 +323,7 @@ export default class Dialog {
 
     if (this.config.isOpen) this.open();
 
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.addEventListener('click', this.toggle));
+    document.addEventListener('click', this[addEventDelegation], { capture: true });
   }
 
   destroy() {
@@ -339,7 +337,6 @@ export default class Dialog {
     this[removeEventListeners]();
     this[removeObserver]();
 
-    // Remove event listener to each opening trigger linked to dialog
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.removeEventListener('click', this.toggle));
+    document.removeEventListener('click', this[addEventDelegation], { capture: true });
   }
 }
