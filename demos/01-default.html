@@ -38,6 +38,16 @@
       const dialog = new Dialog.default('.js-dialog', {
         openingSelector: '.js-dialog-open',
         closingSelector: '.js-dialog-close',
+        helpers: [
+          {
+            selector: 'html',
+            className: 'is-disabled',
+          },
+          {
+            selector: '.js-dialog-open',
+            className: 'is-active',
+          },
+        ],
       });
     </script>
   </body>

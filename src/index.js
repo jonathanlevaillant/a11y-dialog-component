@@ -1,7 +1,6 @@
 /* a11y-dialog-component
  ========================================================================== */
 
-import config from './defaults';
 import focusableElements from './focusableElements';
 import keyCodes from './keyCodes';
 import { getVisibleElements, getNoNestedElements } from './utils';
@@ -14,6 +13,7 @@ const removeEventListeners = Symbol('removeEventListeners');
 const addAttributes = Symbol('addAttributes');
 const removeAttributes = Symbol('removeAttributes');
 const setAttributes = Symbol('setAttributes');
+const setHelpers = Symbol('setHelpers');
 const setFocusableElements = Symbol('setFocusableElements');
 const setFocus = Symbol('setFocus');
 const restoreFocus = Symbol('restoreFocus');
@@ -21,26 +21,6 @@ const switchFocus = Symbol('switchFocus');
 const maintainFocus = Symbol('maintainFocus');
 const addObserver = Symbol('addObserver');
 const removeObserver = Symbol('removeObserver');
-
-let customConfig = config;
-
-// Update the global configuration if needed
-export function setDefaults({
-  documentSelector = customConfig.documentSelector,
-  documentDisabledClass = customConfig.documentDisabledClass,
-  openingTriggerActiveClass = customConfig.openingTriggerActiveClass,
-  delay = customConfig.delay,
-} = {}) {
-  customConfig = {
-    ...config,
-    ...{
-      documentSelector,
-      documentDisabledClass,
-      openingTriggerActiveClass,
-      delay,
-    },
-  };
-}
 
 // Export the default Dialog() class
 export default class Dialog {
@@ -52,16 +32,14 @@ export default class Dialog {
       openingSelector,
       closingSelector,
       backdropSelector,
-      helperSelector,
       labelledby,
       describedby,
+      helpers = [],
       isModal = true,
       isTooltip = false,
       isOpen = false,
       isCreated = true,
-      disableScroll = true,
-      openingTriggerActiveClass = customConfig.openingTriggerActiveClass,
-      delay = customConfig.delay,
+      delay = 200,
     } = {},
   ) {
     // Check if the dialog exists, if not, return an empty constructor
@@ -75,17 +53,13 @@ export default class Dialog {
       openingSelector,
       closingSelector,
       backdropSelector,
-      helperSelector,
       labelledby,
       describedby,
+      helpers,
       isModal,
       isTooltip,
       isCreated,
       isOpen,
-      disableScroll,
-      documentSelector: customConfig.documentSelector,
-      documentDisabledClass: customConfig.documentDisabledClass,
-      openingTriggerActiveClass,
       delay,
     };
 
@@ -94,10 +68,7 @@ export default class Dialog {
     this.openingTriggers = document.querySelectorAll(openingSelector);
     this.closingTriggers = this.dialog.querySelectorAll(closingSelector);
     this.backdropTrigger = document.querySelector(backdropSelector);
-    this.helpers = document.querySelectorAll(helperSelector);
-
-    this.document = document.querySelector(this.config.documentSelector) || document.querySelector('html');
-    this.documentIsAlreadyDisabled = false;
+    this.helpers = helpers;
 
     this.focusableElements = [];
     this.firstFocusableElement = null;
@@ -179,44 +150,33 @@ export default class Dialog {
     this.dialog.removeAttribute('aria-describedby');
     this.dialog.removeAttribute('aria-modal');
 
-    if (this.config.disableScroll && this.isOpen && !this.documentIsAlreadyDisabled) {
-      this.document.classList.remove(this.config.documentDisabledClass);
-    }
-
     this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
-
-    if (this.currentOpeningTrigger) this.currentOpeningTrigger.classList.remove(this.config.openingTriggerActiveClass);
-
-    this.helpers.forEach(helper => helper.classList.remove(this.config.openingTriggerActiveClass));
   }
 
   [setAttributes]() {
     this.dialog.setAttribute('aria-hidden', !this.isOpen);
 
-    if (this.config.disableScroll && !this.documentIsAlreadyDisabled) {
-      if (this.isOpen) {
-        this.document.classList.add(this.config.documentDisabledClass);
-      } else {
-        this.document.classList.remove(this.config.documentDisabledClass);
-      }
-    }
+    // Set custom helper class names
+    this[setHelpers]();
+  }
 
-    if (this.currentOpeningTrigger) {
-      if (this.isOpen) {
-        this.currentOpeningTrigger.classList.add(this.config.openingTriggerActiveClass);
-      } else {
-        this.openingTriggers.forEach(openingTrigger => {
-          openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
-        });
-      }
-    }
+  [setHelpers]() {
+    if (this.isOpen) this.helpers = this.helpers.map(helper => ({ ...helper, isValid: [] }));
 
     this.helpers.forEach(helper => {
-      if (this.isOpen) {
-        helper.classList.add(this.config.openingTriggerActiveClass);
-      } else {
-        helper.classList.remove(this.config.openingTriggerActiveClass);
-      }
+      const elements = document.querySelectorAll(helper.selector);
+      const { className } = helper;
+
+      elements.forEach((element, index) => {
+        if (this.isOpen) {
+          if (!element.classList.contains(className)) {
+            helper.isValid.push(true);
+            element.classList.add(className);
+          } else {
+            helper.isValid.push(false);
+          }
+        } else if (!this.isOpen && helper.isValid[index]) element.classList.remove(className);
+      });
     });
   }
 
@@ -271,7 +231,6 @@ export default class Dialog {
     if (!this.isCreated || this.isOpen) return;
 
     this.isOpen = true;
-    this.documentIsAlreadyDisabled = this.document.classList.contains(this.config.documentDisabledClass);
 
     this[setAttributes]();
     this[addEventListeners]();
