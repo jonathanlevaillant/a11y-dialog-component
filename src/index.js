@@ -4,7 +4,7 @@
 import config from './defaults';
 import focusableElements from './focusableElements';
 import keyCodes from './keyCodes';
-import { getVisibleElements, getNoNestedElements } from './utils';
+import { getVisibleElements, getNoNestedElements, closest } from './utils';
 
 // Use Symbols to create private methods
 const onClick = Symbol('onClick');
@@ -92,7 +92,7 @@ export default class Dialog {
 
     this.dialog = document.querySelector(dialogSelector);
     this.dialogArea = `${dialogSelector}, ${openingSelector}`;
-    this.openingTrigger = null;
+    this.openingTriggers = document.querySelectorAll(openingSelector);
     this.backdropTrigger = document.querySelector(backdropSelector);
     this.helpers = document.querySelectorAll(helperSelector);
 
@@ -102,6 +102,7 @@ export default class Dialog {
     this.focusableElements = [];
     this.firstFocusableElement = null;
     this.lastFocusableElement = null;
+    this.openingTrigger = null;
 
     this.isCreated = false;
     this.isOpen = false;
@@ -145,18 +146,15 @@ export default class Dialog {
   }
 
   [addEventDelegation](event) {
-    // https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
-    console.log(event.target.parentNode);
-
     document.querySelectorAll(this.config.openingSelector).forEach(openingTrigger => {
-      if (event.target === openingTrigger) {
+      if (closest(event.target, openingTrigger)) {
         this.openingTrigger = openingTrigger;
         this.toggle();
       }
     });
 
     document.querySelectorAll(this.config.closingSelector).forEach(closingTrigger => {
-      if (event.target === closingTrigger) this.close();
+      if (closest(event.target, closingTrigger)) this.close();
     });
   }
 
@@ -181,6 +179,8 @@ export default class Dialog {
     if (this.config.describedby) this.dialog.setAttribute('aria-describedby', this.config.describedby);
 
     if (this.config.isModal) this.dialog.setAttribute('aria-modal', true);
+
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.setAttribute('aria-haspopup', 'dialog'));
   }
 
   [removeAttributes]() {
@@ -194,6 +194,8 @@ export default class Dialog {
     if (this.config.disableScroll && this.isOpen && !this.documentIsAlreadyDisabled) {
       this.document.classList.remove(this.config.documentDisabledClass);
     }
+
+    this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
 
     if (this.openingTrigger) this.openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
 

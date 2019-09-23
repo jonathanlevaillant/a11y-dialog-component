@@ -35,3 +35,14 @@ export function getNoNestedElements(context, selector, elements) {
 
   return noNestedElements;
 }
+
+// Check if the parent elements match the target
+export function closest(element, target) {
+  let currentElement = element;
+
+  while (currentElement !== target && currentElement) {
+    currentElement = currentElement.parentNode;
+  }
+
+  return !!currentElement;
+}
