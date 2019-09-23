@@ -14,7 +14,7 @@ A simple and fast way to get started is to include this script on your page. Thi
 `Dialog`
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.3.1/dist/a11y-dialog-component.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.4.0/dist/a11y-dialog-component.min.js"></script>
 ```
 
 If you prefer to install a11y-dialog-component locally in your project, you can either:
