@@ -149,7 +149,7 @@ export default class Dialog {
     document.querySelectorAll(this.config.openingSelector).forEach(openingTrigger => {
       if (closest(event.target, openingTrigger)) {
         this.openingTrigger = openingTrigger;
-        this.toggle();
+        this.toggle(event);
       }
     });
 
@@ -308,8 +308,10 @@ export default class Dialog {
     this.config.onClose(this.dialog, this.openingTrigger);
   }
 
-  toggle() {
+  toggle(event) {
     if (!this.isCreated) return;
+
+    if (event) event.preventDefault();
 
     this.isOpen ? this.close() : this.open();
   }
