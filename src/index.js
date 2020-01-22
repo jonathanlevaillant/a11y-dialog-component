@@ -65,8 +65,11 @@ export default class Dialog {
       delay = customConfig.delay,
     } = {},
   ) {
-    // Check if the dialog exists, if not, return an empty constructor
-    if (!document.querySelector(dialogSelector)) return;
+    // Check if the dialog exists, if not, set `isInitialized` to false
+    if (!document.querySelector(dialogSelector)) {
+      this.isInitialized = false;
+      return;
+    }
 
     // Save the initial configuration
     this.config = {
@@ -116,6 +119,9 @@ export default class Dialog {
 
     // Add mutation observer to update focusable elements
     this.observer = new MutationObserver(mutations => mutations.forEach(() => this[setFocusableElements]()));
+
+    // initialize the dialog
+    this.isInitialized = true;
 
     // Create the dialog
     if (isCreated) this.create();
@@ -278,7 +284,7 @@ export default class Dialog {
   }
 
   open() {
-    if (!this.isCreated || this.isOpen) return;
+    if (!this.isInitialized || !this.isCreated || this.isOpen) return;
 
     this.isOpen = true;
     this.documentIsAlreadyDisabled = this.document.classList.contains(this.config.documentDisabledClass);
@@ -291,7 +297,7 @@ export default class Dialog {
   }
 
   close(event) {
-    if (!this.isCreated || !this.isOpen) return;
+    if (!this.isInitialized || !this.isCreated || !this.isOpen) return;
 
     this.isOpen = false;
 
@@ -309,7 +315,7 @@ export default class Dialog {
   }
 
   toggle(event) {
-    if (!this.isCreated) return;
+    if (!this.isInitialized || !this.isCreated) return;
 
     if (event) event.preventDefault();
 
@@ -317,7 +323,7 @@ export default class Dialog {
   }
 
   create() {
-    if (this.isCreated) return;
+    if (!this.isInitialized || this.isCreated) return;
 
     this.isCreated = true;
 
@@ -331,7 +337,7 @@ export default class Dialog {
   }
 
   destroy() {
-    if (!this.isCreated) return;
+    if (!this.isInitialized || !this.isCreated) return;
 
     this.close();
 
