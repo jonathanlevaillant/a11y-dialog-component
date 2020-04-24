@@ -128,6 +128,9 @@ const Dialogs = (() => {
       this.scrollPosition = 0;
       this.transitionDuration = options.transitionDuration;
 
+      this.onOpen = options.onOpen;
+      this.onClose = options.onClose;
+
       this.show = this.show.bind(this);
       this.hide = this.hide.bind(this);
       this.toggle = this.toggle.bind(this);
@@ -310,6 +313,8 @@ const Dialogs = (() => {
       this.setAttributes();
       this.addEventListeners();
 
+      this.onOpen(this);
+
       window.setTimeout(() => this.setFocus(), this.transitionDuration);
     }
 
@@ -320,6 +325,8 @@ const Dialogs = (() => {
 
       this.setAttributes();
       this.removeEventListeners();
+
+      this.onClose(this);
 
       if (restoreFocus) window.setTimeout(() => this.restoreFocus(), this.transitionDuration);
     }
@@ -398,6 +405,8 @@ const Dialogs = (() => {
     disableScroll = true,
     disableIosScroll = false,
     transitionDuration = 200,
+    onOpen = () => {},
+    onClose = () => {},
   } = {}) => {
     const options = { ...customClassNames };
 
@@ -428,6 +437,9 @@ const Dialogs = (() => {
       options.disableIosScroll = disableIosScroll;
 
       options.transitionDuration = transitionDuration;
+
+      options.onOpen = onOpen;
+      options.onClose = onClose;
 
       const dialog = new Dialog(options);
       dialog.create();
