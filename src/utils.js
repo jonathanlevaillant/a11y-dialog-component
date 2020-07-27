@@ -5,7 +5,7 @@
 export function getVisibleElements(elements) {
   const visibleElements = [];
 
-  elements.forEach(element => {
+  elements.forEach((element) => {
     const bounding = element.getBoundingClientRect();
     const isVisible = bounding.width > 0 || bounding.height > 0;
 
@@ -23,8 +23,8 @@ export function getNoNestedElements(context, selector, elements) {
 
   if (nestedComponents.length === 0) return elements;
 
-  elements.forEach(element => {
-    nestedComponents.forEach(nestedComponent => {
+  elements.forEach((element) => {
+    nestedComponents.forEach((nestedComponent) => {
       if (nestedComponent.contains(element)) isNested = true;
     });
 

@@ -61,6 +61,7 @@ export default class Dialog {
       isOpen = false,
       isCreated = true,
       disableScroll = true,
+      enableAutoFocus = true,
       openingTriggerActiveClass = customConfig.openingTriggerActiveClass,
       delay = customConfig.delay,
     } = {},
@@ -87,6 +88,7 @@ export default class Dialog {
       isCreated,
       isOpen,
       disableScroll,
+      enableAutoFocus,
       documentSelector: customConfig.documentSelector,
       documentDisabledClass: customConfig.documentDisabledClass,
       openingTriggerActiveClass,
@@ -118,7 +120,7 @@ export default class Dialog {
     this[switchFocus] = this[switchFocus].bind(this);
 
     // Add mutation observer to update focusable elements
-    this.observer = new MutationObserver(mutations => mutations.forEach(() => this[setFocusableElements]()));
+    this.observer = new MutationObserver((mutations) => mutations.forEach(() => this[setFocusableElements]()));
 
     // initialize the dialog
     this.isInitialized = true;
@@ -152,14 +154,14 @@ export default class Dialog {
   }
 
   [addEventDelegation](event) {
-    document.querySelectorAll(this.config.openingSelector).forEach(openingTrigger => {
+    document.querySelectorAll(this.config.openingSelector).forEach((openingTrigger) => {
       if (closest(event.target, openingTrigger)) {
         this.openingTrigger = openingTrigger;
         this.toggle(event);
       }
     });
 
-    document.querySelectorAll(this.config.closingSelector).forEach(closingTrigger => {
+    document.querySelectorAll(this.config.closingSelector).forEach((closingTrigger) => {
       if (closest(event.target, closingTrigger)) this.close();
     });
   }
@@ -186,7 +188,7 @@ export default class Dialog {
 
     if (this.config.isModal) this.dialog.setAttribute('aria-modal', true);
 
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.setAttribute('aria-haspopup', 'dialog'));
+    this.openingTriggers.forEach((openingTrigger) => openingTrigger.setAttribute('aria-haspopup', 'dialog'));
   }
 
   [removeAttributes]() {
@@ -201,11 +203,11 @@ export default class Dialog {
       this.document.classList.remove(this.config.documentDisabledClass);
     }
 
-    this.openingTriggers.forEach(openingTrigger => openingTrigger.removeAttribute('aria-haspopup'));
+    this.openingTriggers.forEach((openingTrigger) => openingTrigger.removeAttribute('aria-haspopup'));
 
     if (this.openingTrigger) this.openingTrigger.classList.remove(this.config.openingTriggerActiveClass);
 
-    this.helpers.forEach(helper => helper.classList.remove(this.config.openingTriggerActiveClass));
+    this.helpers.forEach((helper) => helper.classList.remove(this.config.openingTriggerActiveClass));
   }
 
   [setAttributes]() {
@@ -227,7 +229,7 @@ export default class Dialog {
       }
     }
 
-    this.helpers.forEach(helper => {
+    this.helpers.forEach((helper) => {
       if (this.isOpen) {
         helper.classList.add(this.config.openingTriggerActiveClass);
       } else {
@@ -246,11 +248,11 @@ export default class Dialog {
   }
 
   [setFocus]() {
-    window.setTimeout(() => this.firstFocusableElement.focus(), this.config.delay);
+    if (this.config.enableAutoFocus) window.setTimeout(() => this.firstFocusableElement.focus(), this.config.delay);
   }
 
   [restoreFocus]() {
-    window.setTimeout(() => this.openingTrigger.focus(), this.config.delay);
+    if (this.config.enableAutoFocus) window.setTimeout(() => this.openingTrigger.focus(), this.config.delay);
 
     // Switch focus between the current opening trigger and the non-modal dialog
     if (this.isOpen) this.openingTrigger.addEventListener('keydown', this[switchFocus]);
