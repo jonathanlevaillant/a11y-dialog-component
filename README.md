@@ -14,7 +14,7 @@ A simple and fast way to get started is to include this script on your page. Thi
 `Dialog`
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.4.1/dist/a11y-dialog-component.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.5.0/dist/a11y-dialog-component.min.js"></script>
 ```
 
 If you prefer to install a11y-dialog-component locally in your project, you can either:
@@ -142,6 +142,7 @@ Below is a list of all possible options you can pass to a dialog.
 | **isCreated**                   | `true`      | `Boolean`  | If `true`, create the dialog when initialized. If disabled, then you need to create it manually by using `create()` method.                                            |
 | **isOpen**                      | `false`     | `Boolean`  | If `true`, open the dialog when initialized.                                                                                                                           |
 | **disableScroll**               | `true`      | `Boolean`  | If `true`, disable scrolling on the page while the dialog is open.                                                                                                     |
+| **enableAutoFocus**             | `true`      | `Boolean`  | If `true`, focus moves to an element contained in the dialog when it opens.                                                                                            |
 | **openingTriggerActiveClass\*** | `is-active` | `String`   | Add a class on the opening trigger and helper selectors while the dialog is open.                                                                                      |
 | **delay**                       | `200`       | `Number`   | Delay in ms once a trigger event is fired before the dialog autofocus. Usually matches with the CSS transition value to open or close this dialog.                     |
 

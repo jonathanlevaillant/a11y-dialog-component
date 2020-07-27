@@ -1,6 +1,6 @@
 {
   "name": "a11y-dialog-component",
-  "version": "5.4.1",
+  "version": "5.5.0",
   "description": "Highly customizable accessible dialog library written in Vanilla JS",
   "author": "Jonathan Levaillant <jonathan.levaillant@outlook.com> (http://jonathanlevaillant.fr)",
   "license": "MIT",
@@ -50,18 +50,18 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.8.3",
-    "@babel/preset-env": "^7.8.3",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-prettier": "^3.1.2",
-    "husky": "^4.2.0",
-    "lint-staged": "^10.0.2",
-    "prettier": "^1.19.1",
-    "rimraf": "^3.0.0",
-    "rollup": "^1.29.1",
-    "rollup-plugin-babel": "^4.3.3",
+    "@babel/core": "^7.10.5",
+    "@babel/preset-env": "^7.10.4",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.23.0",
+    "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-eslint": "^7.0.0",
     "rollup-plugin-uglify": "^6.0.4"
   }
