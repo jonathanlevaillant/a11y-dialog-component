@@ -108,6 +108,7 @@ export default class Dialog {
     this.firstFocusableElement = null;
     this.lastFocusableElement = null;
     this.openingTrigger = null;
+    this.closingTrigger = null;
 
     this.isCreated = false;
     this.isOpen = false;
@@ -162,7 +163,10 @@ export default class Dialog {
     });
 
     document.querySelectorAll(this.config.closingSelector).forEach((closingTrigger) => {
-      if (closest(event.target, closingTrigger)) this.close();
+      if (closest(event.target, closingTrigger)) {
+        this.closingTrigger = closingTrigger;
+        this.close();
+      }
     });
   }
 
@@ -313,7 +317,7 @@ export default class Dialog {
       this[restoreFocus]();
     }
 
-    this.config.onClose(this.dialog, this.openingTrigger);
+    this.config.onClose(this.dialog, this.closingTrigger);
   }
 
   toggle(event) {
