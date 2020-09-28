@@ -14,7 +14,7 @@ A simple and fast way to get started is to include this script on your page. Thi
 `Dialog`
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.5.0/dist/a11y-dialog-component.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/a11y-dialog-component@5.5.1/dist/a11y-dialog-component.min.js"></script>
 ```
 
 If you prefer to install a11y-dialog-component locally in your project, you can either:
@@ -130,7 +130,7 @@ Below is a list of all possible options you can pass to a dialog.
 | Option                          | Default     | Value      | Description                                                                                                                                                            |
 | ------------------------------- | ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **onOpen**                      | `noop`      | `Function` | Lifecycle function invoked when the dialog is opening. The function receives the dialog object as the first parameter and the opening trigger as the second parameter. |
-| **onClose**                     | `noop`      | `Function` | Lifecycle function invoked when the dialog is closing. The function receives the dialog object as the first parameter and the opening trigger as the second parameter. |
+| **onClose**                     | `noop`      | `Function` | Lifecycle function invoked when the dialog is closing. The function receives the dialog object as the first parameter and the closing trigger as the second parameter. |
 | **openingSelector**             | `""`        | `String`   | CSS selector used to open the dialog.                                                                                                                                  |
 | **closingSelector**             | `""`        | `String`   | CSS selector used to close the dialog.                                                                                                                                 |
 | **backdropSelector**            | `""`        | `String`   | CSS selector used to include a backdrop element which close the dialog on click.                                                                                       |
