@@ -129,8 +129,8 @@ Below is a list of all possible options you can pass to a dialog.
 
 | Option                          | Default     | Value      | Description                                                                                                                                                            |
 | ------------------------------- | ----------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **onOpen**                      | `noop`      | `Function` | Lifecycle function invoked when the dialog is opening. The function receives the dialog object as the first parameter and the opening trigger as the second parameter. |
-| **onClose**                     | `noop`      | `Function` | Lifecycle function invoked when the dialog is closing. The function receives the dialog object as the first parameter and the closing trigger as the second parameter. |
+| **onOpen**                      | `noop`      | `Function` | Lifecycle function invoked when the dialog is opening. The function receives the dialog DOM element as the first parameter and the opening trigger as the second parameter. |
+| **onClose**                     | `noop`      | `Function` | Lifecycle function invoked when the dialog is closing. The function receives the dialog DOM element as the first parameter and the closing trigger as the second parameter. |
 | **openingSelector**             | `""`        | `String`   | CSS selector used to open the dialog.                                                                                                                                  |
 | **closingSelector**             | `""`        | `String`   | CSS selector used to close the dialog.                                                                                                                                 |
 | **backdropSelector**            | `""`        | `String`   | CSS selector used to include a backdrop element which close the dialog on click.                                                                                       |
